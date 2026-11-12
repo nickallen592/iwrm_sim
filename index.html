@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conservancy Council</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: control strip (season, forecast, storage) → six team decision cards → results (balance, outcomes, chart, scores, log) */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --ink:#13242c; --muted:#5a6c74; --line:#d2dde1;
+  --water:#1b6585; --water-soft:#d5e8f0;
+  --good:#2c7a4b; --warn:#a86b12; --bad:#b0352d;
+  --t-gwi:#2b6cb0; --t-rice:#5b8c25; --t-sugar:#b0513a; --t-op:#4b5a6b; --t-mahaica:#12868a; --t-env:#7a5ca8; --t-upfarm:#8f6a2e; --t-upmine:#b83a78;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
+    --water:#5ab3d3; --water-soft:#1a3946;
+    --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
+    --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0; --t-upfarm:#d4a65e; --t-upmine:#e886b6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
+  --water:#5ab3d3; --water-soft:#1a3946;
+  --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
+  --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0; --t-upfarm:#d4a65e; --t-upmine:#e886b6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 60px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:30px;font-weight:700;letter-spacing:.2px}
+h2{font-size:20px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+.sub{color:var(--muted);max-width:70ch;margin:4px 0 0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.brandbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:52px;width:auto}
+.brand-text{font:600 14px/1.25 var(--display);color:var(--muted)}
+.brand-text strong{display:block;color:var(--ink);font-size:16px}
+.docslink{font:600 14px var(--body);color:var(--water);text-decoration:none;border:1px solid var(--water);border-radius:8px;padding:8px 14px}
+.docslink:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+.upbox{display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--t-upfarm)}
+.uphead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.uphead label{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14px}
+.upfixed{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.upfixed div{background:var(--bg);border-radius:8px;padding:10px 12px;font-size:14px}
+.upfixed b{display:block;font:500 18px var(--mono)}
+.selrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-weight:500}
+.q{display:inline-flex;align-items:center;gap:6px;font:500 13px var(--body);padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.q.good{color:var(--good)} .q.caution{color:var(--warn)} .q.poor{color:var(--bad)}
+.minis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.minis > div{min-width:0}
+.minis svg{width:100%;height:auto;display:block}
+.minis h3{font-size:15px;margin-bottom:4px}
+@media (max-width:860px){ .minis{grid-template-columns:1fr} }
+.tag{font:500 12px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px;white-space:nowrap}
+
+/* control strip */
+.strip{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+.gauge{display:flex;gap:12px;align-items:center}
+.season-big{font:600 24px var(--display)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:14px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 13px var(--body);padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.chip.dry{color:var(--warn)} .chip.wet{color:var(--water)} .chip.norm{color:var(--good)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+button{font:600 14px var(--body);border-radius:8px;padding:9px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.primary{background:var(--water);border-color:var(--water);color:#fff}
+:root[data-theme="dark"] button.primary{color:#06202b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.primary{color:#06202b}}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+select,input[type=number],input[type=text]{font:14px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.rule{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+
+/* team cards */
+.teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card .who{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card .role{color:var(--muted);font-size:13px}
+.card .total{font:500 13px var(--mono);color:var(--c);white-space:nowrap}
+.ctrl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:500}
+.ctrl output{font:500 14px var(--mono);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--c)}
+.hint{font-size:13px;color:var(--muted)}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:13.5px}
+.preview{font:13px var(--mono);color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+
+/* results */
+.results{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:14px}
+.results > .panel{min-width:0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+td.r,th.r{text-align:right}
+tr.total td{font-weight:600;border-top:2px solid var(--ink);border-bottom:none}
+.scroll{overflow-x:auto}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:6px}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.bar{height:8px;border-radius:4px;background:var(--water-soft);overflow:hidden;min-width:60px}
+.bar > i{display:block;height:100%;background:var(--c, var(--water))}
+.empty{color:var(--muted);padding:20px 4px}
+.chartbox svg{width:100%;height:auto;display:block}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.log li{border-left:4px solid var(--muted);padding:4px 10px;font-size:14px;background:var(--bg);border-radius:0 6px 6px 0}
+.log li.bad{border-color:var(--bad)} .log li.warn{border-color:var(--warn)} .log li.good{border-color:var(--good)} .log li.info{border-color:var(--water)}
+.log b{font-family:var(--mono);font-weight:500;color:var(--muted);margin-right:6px}
+.scores{display:flex;flex-direction:column;gap:8px}
+.score{display:grid;grid-template-columns:150px 1fr 60px;align-items:center;gap:10px;font-size:14px}
+.scorebar{position:relative;height:14px;background:var(--bg);border-radius:4px}
+.scorebar i{position:absolute;top:0;bottom:0;background:var(--c);border-radius:3px}
+.scorebar .zero{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+details.panel summary{cursor:pointer;font:600 17px var(--display)}
+details.panel[open] summary{margin-bottom:12px}
+.guide{max-width:78ch}
+.guide p,.guide li{margin:0 0 8px}
+.guide code{font:13px var(--mono);background:var(--bg);padding:1px 5px;border-radius:4px}
+.settings{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 18px}
+.settings label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px}
+.settings input[type=number]{width:90px}
+textarea{width:100%;min-height:140px;font:12px var(--mono);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}
+.banner{border:1px solid var(--line);border-left:5px solid var(--water);background:var(--surface);padding:10px 14px;border-radius:8px;font-size:14px}
+.over{border-left-color:var(--good)}
+@media (max-width:860px){
+  .strip{grid-template-columns:auto 1fr}
+  .actions{grid-column:1/-1;justify-content:flex-start}
+  .results,.two{grid-template-columns:1fr}
+}
+@media (max-width:420px){
+  .teams{grid-template-columns:1fr}
+  .score{grid-template-columns:110px 1fr 48px}
+}
+@media (prefers-reduced-motion:no-preference){ .bar>i,.scorebar i{transition:width .3s, left .3s} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <div class="brand">
+      <img src="assets/fees-logo.png" alt="Faculty of Earth and Environmental Sciences logo" onerror="this.remove()">
+      <div class="brand-text"><strong>Faculty of Earth and Environmental Sciences</strong>University of Guyana</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="docslink" href="docs.html">Rules, theory and equations</a><a class="docslink" href="compare.html">Compare tables</a></div>
+  </div>
+  <header>
+    <div>
+      <h1>Conservancy Council</h1>
+      <p class="sub">An IWRM role-play for six downstream stakeholder teams, plus two optional upstream teams, sharing one coastal water conservancy. Each season the teams negotiate, set their decisions, and the model returns the water balance, water quality, who went short, who flooded, and what reached the coast.</p>
+    </div>
+    <span class="tag">Illustrative numbers · edit in Settings</span>
+  </header>
+
+  <section class="panel strip" aria-label="Season status">
+    <div class="gauge" id="gauge"></div>
+    <div>
+      <div class="season-big" id="seasonTitle"></div>
+      <div class="meta" id="seasonMeta"></div>
+      <div class="meta" id="qMeta"></div>
+      <div class="rule" style="margin-top:10px">
+        <label for="rule"><strong>Council allocation rule in a shortage:</strong></label>
+        <select id="rule">
+          <option value="proportional">Share shortages proportionally</option>
+          <option value="drinking">Drinking water first (GWI), then irrigation</option>
+          <option value="irrigation">Irrigation first, then GWI</option>
+        </select>
+      </div>
+      <div class="rule" style="margin-top:8px">
+        <label for="tableName"><strong>Table name:</strong></label>
+        <input type="text" id="tableName" maxlength="40" placeholder="e.g. Table 3" style="width:200px">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="runBtn">Run this season</button>
+      <button id="undoBtn">Undo last season</button>
+      <button id="resetBtn">Restart game</button>
+    </div>
+  </section>
+
+  <div id="banner"></div>
+
+  <section aria-label="Team decisions">
+    <h2 style="margin-bottom:10px">Team decisions for this season</h2>
+    <div class="teams" id="teams"></div>
+  </section>
+
+  <section class="panel upbox" aria-label="Upstream basin">
+    <div class="uphead">
+      <div>
+        <h2>Upstream basin</h2>
+        <p class="hint" style="margin:2px 0 0;max-width:70ch">Farms and mines in the conservancy's catchment, outside the council's control. Their fertilizer and sediment flow into the conservancy, and their land clearing changes how much water arrives.</p>
+      </div>
+      <label for="upmode">Upstream is
+        <select id="upmode">
+          <option value="pristine">Fixed: pristine forest</option>
+          <option value="current">Fixed: current practice</option>
+          <option value="expansion">Fixed: farming and mining expansion</option>
+          <option value="played">Played by two upstream teams</option>
+        </select>
+      </label>
+    </div>
+    <div id="upbody"></div>
+  </section>
+
+  <section class="results">
+    <div class="panel">
+      <h2 id="balTitle">Water balance</h2>
+      <div id="balance"></div>
+    </div>
+    <div class="panel">
+      <h2 id="outTitle">Stakeholder outcomes</h2>
+      <div class="scroll" id="outcomes"></div>
+    </div>
+  </section>
+
+  <section class="results">
+    <div class="panel">
+      <h2 id="qualTitle">Water quality</h2>
+      <div class="scroll" id="quality"></div>
+    </div>
+    <div class="panel">
+      <h2>Quality over the game</h2>
+      <p class="hint" style="margin:2px 0 8px">Conservancy concentrations at the end of each season, and nitrogen reaching the estuary. Dashed lines: amber caution, red poor.</p>
+      <div class="minis" id="qcharts"></div>
+    </div>
+  </section>
+
+  <section class="panel chartbox">
+    <h2>Conservancy storage over the game</h2>
+    <p class="hint" style="margin:2px 0 8px">Million m³ at the end of each season, against the dam-safety, safe-operating, wetland-health and dead-storage levels.</p>
+    <div id="chart"></div>
+  </section>
+
+  <section class="two">
+    <div class="panel">
+      <h2 style="margin-bottom:10px">Scoreboard</h2>
+      <div class="scores" id="scores"></div>
+      <p class="hint" id="basinTotal" style="margin:12px 0 0"></p>
+    </div>
+    <div class="panel">
+      <h2 style="margin-bottom:10px">Event log</h2>
+      <ul class="log" id="log"></ul>
+    </div>
+  </section>
+
+  <details class="panel">
+    <summary>Facilitator guide and model equations</summary>
+    <div class="guide">
+      <h3>Running a session (about 90 minutes)</h3>
+      <ol>
+        <li>Split participants into six teams and give each a role: GWI, Rice farmers, Sugar estate, Conservancy operator, Mahaica communities, Environment (EPA). Put this page on the projector; the facilitator enters decisions.</li>
+        <li>Read out the season and the rainfall forecast. The forecast is right about 70% of the time, like a real seasonal outlook.</li>
+        <li>Give teams 5–8 minutes to negotiate. The council (all teams together) agrees on the allocation rule. Each team then tells the facilitator its decision.</li>
+        <li>Click <strong>Run this season</strong>. Read out the water balance and the events. Ask who gained and who paid.</li>
+        <li>Play 8 seasons (two years). The default climate script has a La Niña flood season early and El Niño droughts later, so teams face both too much and too little water.</li>
+      </ol>
+      <h3>Water quality and the upstream basin</h3>
+      <p>Coastal rice and sugar choose a fertilizer rate. Their runoff drains to the estuary through canals and kokers, not into the conservancy. The conservancy's own quality depends on the upstream catchment: farm fertilizer adds nitrogen, mining and cleared land add sediment. Polluted water raises GWI's treatment costs and harms Mahaica livestock when it is released, and nitrogen reaching the estuary threatens marine life.</p>
+      <p><strong>Suggested run:</strong> play seasons 1–4 with upstream fixed at <em>current practice</em>, switch to <em>expansion</em> for seasons 5–6 without warning, then hand the upstream basin to two teams for seasons 7–8 and let everyone negotiate across the basin boundary.</p>
+      <h3>Debrief questions</h3>
+      <ul>
+        <li>Who carried the cost when the operator released water to protect the dam? Was that agreed or imposed?</li>
+        <li>Did any team over-plant or over-request because the forecast looked good? What happened when the forecast was wrong?</li>
+        <li>How did the allocation rule change who went short? Which rule is fairest, and which is in Guyana's law and practice?</li>
+        <li>What data or institutions (gauges, forecasts, a basin council, compensation for Mahaica) would have changed your decisions?</li>
+        <li>Which team's score best reflects the public interest? Is the basin total a fair measure?</li>
+        <li>What changed when the upstream basin got a seat at the table? Which agency or forum should host that conversation in reality?</li>
+        <li>Coastal farmers earned more with high fertilizer while the estuary paid. Who should bear that cost, and what would make them change?</li>
+      </ul>
+      <h3>Model equations (per season, in million m³)</h3>
+      <p><code>Inflow = base inflow × climate factor × (1 ± noise)</code>; climate factor is 0.4 for El Niño, 1.0 for Normal, 1.7 for La Niña. El Niño also raises evaporation by 20%.</p>
+      <p><code>Floor = max(dead storage, Environment reserve)</code>. <code>Available = Start + Inflow − Evaporation − Floor</code>.</p>
+      <p>Demands: GWI = its request; Rice = area (thousand ha) × rice rate × season crop factor; Sugar likewise. If demands exceed Available, the council rule shares the shortfall.</p>
+      <p><code>Release = min(operator request, sluice capacity, storage above dead storage)</code>. <code>End = Start + Inflow − Evaporation − Delivered − Release</code>. Anything above the dam crest overtops and counts as a breach.</p>
+      <p>Points: GWI 30 × share of need met (leak repair costs 15 and cuts need by 2 for the rest of the game). Rice and Sugar earn area × (revenue × share met − cost). Operator +20 in the safe band, −30 above the safe level, −100 for a breach, +10 if users got at least 90%. Mahaica earns income from floodplain activity minus damage from releases above the river's safe limit. Environment +25 if storage ends above the wetland-health level, otherwise −25. A breach costs every other team 50.</p>
+      <p>The <a href="docs.html">full documentation</a> covers the theory, every equation, scoring rationale and worked examples.</p>
+      <p>All values are placeholders for teaching. Replace them in Settings with real conservancy storage, inflow and demand figures, or with outputs from a WEAP model of the system.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Settings</summary>
+    <p class="hint" style="margin-top:0">Changing settings restarts the game. Units are million m³ per season unless noted.</p>
+    <div class="settings" id="settings"></div>
+    <h3 style="margin:16px 0 8px">Seasons</h3>
+    <div class="scroll"><table id="seasonTable"></table></div>
+    <h3 style="margin:16px 0 8px">Climate for each season</h3>
+    <div class="settings" id="scriptBox"></div>
+    <div style="margin-top:14px"><button class="primary" id="applyBtn">Apply settings and restart</button> <span class="hint" id="applyMsg"></span></div>
+  </details>
+
+  <section class="panel" aria-label="Send results">
+    <h2>Send your table's results</h2>
+    <p class="hint" style="margin:4px 0 10px;max-width:75ch">When your table has finished, send the results to the facilitator, who opens them on the <a href="compare.html">Compare tables</a> page. Download the results file and send it by WhatsApp, email or USB. If sending a file is awkward, copy the results code and paste it into a message instead.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="primary" id="dlBtn">Download results file</button>
+      <button id="codeBtn">Copy results code</button>
+      <span class="hint" id="sendMsg" role="status"></span>
+    </div>
+    <textarea id="codeBox" readonly aria-label="Results code" style="display:none;margin-top:10px;min-height:90px"></textarea>
+  </section>
+
+  <details class="panel">
+    <summary>Export results as a spreadsheet (CSV)</summary>
+    <p class="hint" style="margin-top:0">One row per season. Copy and paste into Excel or Google Sheets.</p>
+    <textarea id="csv" readonly aria-label="Results as CSV"></textarea>
+    <div style="margin-top:8px"><button id="copyBtn">Copy CSV</button> <span class="hint" id="copyMsg"></span></div>
+  </details>
+</div>
+
+<script>
+// ---- Conservancy Council v2: water balance + water quality + upstream basin (pure functions) ----
+const DEFAULTS = {
+  rounds: 8, seed: 2026, climateMode: 'script', forecastSkill: 0.7, noise: 0.15,
+  s0: 200, sDead: 60, healthy: 120, sSafe: 300, sMax: 340,
+  sluiceCap: 150, mahaicaThreshold: 60,
+  gwiDemand: 15, leakSave: 2, leakCost: 15,
+  riceRate: 4.0, riceRev: 10, riceCost: 4,
+  sugarRate: 2.5, sugarRev: 8, sugarCost: 3,
+  mahaicaIncome: 40, floodDamage: 1.2,
+  // water quality
+  n0: 0.6, tss0: 10,                 // starting conservancy concentrations, mg/L
+  bgN: 0.4, bgTSS: 8,                // natural concentration of catchment inflow, mg/L
+  kN: 0.3, kTSS: 0.6,                // fraction removed in the conservancy each season (uptake, settling)
+  exportWet: 0.25, exportDry: 0.08,  // fraction of applied N washed off the land
+  nGood: 1.0, nPoor: 2.0, tssGood: 25, tssPoor: 60,
+  livestockLoss: 15,
+  coastGood: 450, coastPoor: 650,    // tonnes N reaching the estuary per season
+  bufferCut: 0.3, bufferCost: 0.3,
+  gwiTreatTSS: 0.25, gwiTreatN: 8, gwiTreatCap: 20,
+  // upstream basin
+  upRev: 8, upCost: 3, mineEarn: [0, 25, 50, 80], mineSed: [0, 5000, 14000, 30000],
+  pondRemoval: 0.7, pondCost: 12, upWetRunoff: 0.01, upWetMine: 0.03, upDryArea: 0.008, upDryMine: 0.015,
+  seasons: [
+    { name: 'Long dry',  months: 'Feb–Apr', inflow: 40,  evap: 35, cropFactor: 1.0, wet: false },
+    { name: 'Long wet',  months: 'May–Aug', inflow: 220, evap: 25, cropFactor: 0.5, wet: true },
+    { name: 'Short dry', months: 'Sep–Nov', inflow: 35,  evap: 40, cropFactor: 1.0, wet: false },
+    { name: 'Short wet', months: 'Dec–Jan', inflow: 120, evap: 15, cropFactor: 0.6, wet: true }
+  ],
+  script: ['Normal', 'La Niña', 'Normal', 'Normal', 'El Niño', 'Normal', 'El Niño', 'La Niña']
+};
+const CLIMS = ['El Niño', 'Normal', 'La Niña'];
+// fertilizer: N applied (kg/ha/season), yield multiplier, extra cost per k ha
+const FERT = {
+  low:  { rice: 40,  sugar: 30, up: 60,   yield: 0.85, cost: -0.5 },
+  med:  { rice: 80,  sugar: 60, up: 120, yield: 1.00, cost: 0 },
+  high: { rice: 120, sugar: 90, up: 200, yield: 1.15, cost: 0.8 }
+};
+const UP_SCENARIOS = {
+  pristine:  { label: 'Pristine forest',              areaU: 0, fertU: 'low',  mine: 0, ponds: false },
+  current:   { label: 'Current practice',             areaU: 4, fertU: 'med',  mine: 1, ponds: false },
+  expansion: { label: 'Farming and mining expansion', areaU: 9, fertU: 'high', mine: 3, ponds: false }
+};
+const MINE_LABELS = ['None', 'Small-scale', 'Medium-scale', 'Large-scale'];
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function makeWorld(P) {
+  const rng = mulberry32(Number(P.seed) || 1);
+  const actual = [], forecast = [], noise = [];
+  for (let r = 0; r < P.rounds; r++) {
+    let a;
+    if (P.climateMode === 'script') a = P.script[r % P.script.length] || 'Normal';
+    else { const u = rng(); a = u < 0.25 ? 'El Niño' : u < 0.75 ? 'Normal' : 'La Niña'; }
+    actual.push(a);
+    const others = CLIMS.filter(c => c !== a);
+    forecast.push(rng() < P.forecastSkill ? a : others[Math.floor(rng() * 2)]);
+    noise.push((rng() * 2 - 1) * P.noise);
+  }
+  return { actual, forecast, noise };
+}
+
+function climInflowMult(c) { return c === 'El Niño' ? 0.4 : c === 'La Niña' ? 1.7 : 1; }
+function climEvapMult(c) { return c === 'El Niño' ? 1.2 : 1; }
+
+function upstreamOf(dec) {
+  if (dec.up.mode === 'played') return { areaU: dec.up.areaU, fertU: dec.up.fertU, mine: dec.up.mine, ponds: dec.up.ponds, played: true };
+  const s = UP_SCENARIOS[dec.up.mode] || UP_SCENARIOS.current;
+  return { areaU: s.areaU, fertU: s.fertU, mine: s.mine, ponds: s.ponds, played: false };
+}
+
+function allocate(dem, avail, rule) {
+  const out = { gwi: 0, rice: 0, sugar: 0 };
+  const share = (ks, w) => {
+    const t = ks.reduce((s, k) => s + dem[k], 0);
+    if (t <= w) { ks.forEach(k => out[k] = dem[k]); return w - t; }
+    ks.forEach(k => out[k] = dem[k] * w / t);
+    return 0;
+  };
+  if (rule === 'drinking') share(['rice', 'sugar'], share(['gwi'], avail));
+  else if (rule === 'irrigation') share(['gwi'], share(['rice', 'sugar'], avail));
+  else share(['gwi', 'rice', 'sugar'], avail);
+  return out;
+}
+
+function seasonDemands(P, r, dec) {
+  const season = P.seasons[r % 4];
+  return {
+    gwi: dec.gwi.request,
+    rice: dec.rice.area * P.riceRate * season.cropFactor,
+    sugar: dec.sugar.area * P.sugarRate * season.cropFactor
+  };
+}
+
+// state = { S, MN, MT } : storage (Mm³), nitrogen mass (t), sediment mass (t)
+function initialState(P) { return { S: P.s0, MN: P.n0 * P.s0, MT: P.tss0 * P.s0 }; }
+
+function simulateSeason(P, st, r, dec, world, leakSavings) {
+  const season = P.seasons[r % 4];
+  const clim = world.actual[r];
+  const up = upstreamOf(dec);
+  const S0 = st.S;
+
+  // --- quantity ---
+  const upMult = season.wet ? 1 + P.upWetRunoff * up.areaU + P.upWetMine * up.mine
+                            : Math.max(0.5, 1 - P.upDryArea * up.areaU - P.upDryMine * up.mine);
+  const inflow = season.inflow * climInflowMult(clim) * (1 + world.noise[r]) * upMult;
+  const evap = season.evap * climEvapMult(clim);
+  const floor = Math.max(P.sDead, dec.env.reserve);
+  const avail = Math.max(0, S0 + inflow - evap - floor);
+  const gwiNeed = Math.max(0, P.gwiDemand - leakSavings);
+  const dem = seasonDemands(P, r, dec);
+  const del = allocate(dem, avail, dec.rule);
+  const delivered = del.gwi + del.rice + del.sugar;
+  const vMix = S0 + inflow - evap;
+  const afterW = vMix - delivered;
+  const relMax = Math.max(0, Math.min(P.sluiceCap, afterW - P.sDead));
+  const release = Math.min(dec.op.release, relMax);
+  let S1 = afterW - release;
+  const overtop = Math.max(0, S1 - P.sMax);
+  if (overtop > 0) S1 = P.sMax;
+  const breach = overtop > 0;
+
+  // --- quality: loads into the conservancy (tonnes) ---
+  const exportF = season.wet ? P.exportWet : P.exportDry;
+  const loadN_bg = P.bgN * inflow;
+  const loadN_up = up.areaU * FERT[up.fertU].up * exportF;                // k ha × kg/ha = t
+  const sedRaw = P.mineSed[up.mine] * (season.wet ? 1.5 : 0.5);
+  const loadT_mine = sedRaw * (up.ponds ? 1 - P.pondRemoval : 1);
+  const loadT_bg = P.bgTSS * inflow;
+  const loadT_land = up.areaU * 300 * (season.wet ? 1 : 0.3);               // cleared farmland erosion, t
+  const MNmix = (st.MN + loadN_bg + loadN_up) * (1 - P.kN);
+  const MTmix = (st.MT + loadT_bg + loadT_mine + loadT_land) * (1 - P.kTSS);
+  const cN = MNmix / vMix, cT = MTmix / vMix;                              // t/Mm³ = mg/L
+  const MN1 = cN * S1, MT1 = cT * S1;
+
+  // --- loads to the estuary and coast (tonnes N) ---
+  const buffer = dec.env.rule === 'buffer';
+  const capOn = dec.env.rule === 'cap';
+  const fertR = capOn && dec.rice.fert === 'high' ? 'med' : dec.rice.fert;
+  const fertS = capOn && dec.sugar.fert === 'high' ? 'med' : dec.sugar.fert;
+  const cut = buffer ? 1 - P.bufferCut : 1;
+  const coastFarmN = (dec.rice.area * FERT[fertR].rice + dec.sugar.area * FERT[fertS].sugar) * exportF * cut;
+  const coastRelN = (release + overtop) * cN;
+  const coastN = coastFarmN + coastRelN;
+
+  // --- scores ---
+  const frac = k => dem[k] > 0 ? del[k] / dem[k] : 1;
+  const gwiFrac = gwiNeed > 0 ? Math.min(1, del.gwi / gwiNeed) : 1;
+  const totalDem = dem.gwi + dem.rice + dem.sugar;
+  const pctMet = totalDem > 0 ? delivered / totalDem : 1;
+  const excess = Math.max(0, release - P.mahaicaThreshold);
+  const act = dec.mahaica.activity / 100;
+  const damage = excess * P.floodDamage * act;
+  const treat = Math.min(P.gwiTreatCap, P.gwiTreatTSS * Math.max(0, cT - P.tssGood) + P.gwiTreatN * Math.max(0, cN - P.nGood));
+  const livestockHit = release > 0 && (cN > P.nPoor || cT > P.tssPoor);
+  const livestock = livestockHit ? P.livestockLoss * act : 0;
+  const farmExtra = buffer ? P.bufferCost : 0;
+  const qStatus = (cN > P.nPoor || cT > P.tssPoor) ? 'poor' : (cN > P.nGood || cT > P.tssGood) ? 'caution' : 'good';
+  const coastStatus = coastN >= P.coastPoor ? 'poor' : coastN > P.coastGood ? 'caution' : 'good';
+
+  const pts = {
+    gwi: 30 * gwiFrac - (dec.gwi.leak ? P.leakCost : 0) - treat,
+    rice: dec.rice.area * (P.riceRev * FERT[fertR].yield * frac('rice') - P.riceCost - FERT[fertR].cost - farmExtra),
+    sugar: dec.sugar.area * (P.sugarRev * FERT[fertS].yield * frac('sugar') - P.sugarCost - FERT[fertS].cost - farmExtra),
+    op: (breach ? -100 : S1 > P.sSafe ? -30 : 20) + (pctMet >= 0.9 ? 10 : 0),
+    mahaica: P.mahaicaIncome * act - damage - livestock,
+    env: (S1 >= P.healthy ? 25 : -25) + (qStatus === 'good' ? 10 : qStatus === 'poor' ? -15 : 0) + (coastStatus === 'good' ? 10 : coastStatus === 'poor' ? -20 : 0),
+    upfarm: up.played ? up.areaU * (P.upRev * FERT[up.fertU].yield - P.upCost - FERT[up.fertU].cost) : 0,
+    upmine: up.played ? P.mineEarn[up.mine] - (up.ponds && up.mine > 0 ? P.pondCost : 0) : 0
+  };
+  if (breach) for (const k of ['gwi', 'rice', 'sugar', 'mahaica', 'env']) pts[k] -= 50;
+
+  // --- events ---
+  const events = [];
+  if (world.forecast[r] !== clim) events.push({ lvl: 'warn', t: `Forecast missed: ${world.forecast[r]} was forecast, ${clim} arrived.` });
+  if (breach) events.push({ lvl: 'bad', t: `Dam overtopped by ${overtop.toFixed(0)} Mm³. Flooding on the coast; downstream teams lose 50 points each.` });
+  else if (S1 > P.sSafe) events.push({ lvl: 'warn', t: `Conservancy above the safe level (${S1.toFixed(0)} Mm³). The dam is under strain.` });
+  if (pctMet < 0.999) events.push({ lvl: pctMet < 0.7 ? 'bad' : 'warn', t: `Shortage: users received ${(pctMet * 100).toFixed(0)}% of what they requested.` });
+  if (gwiFrac < 0.999) events.push({ lvl: 'bad', t: `Georgetown supply short: GWI met ${(gwiFrac * 100).toFixed(0)}% of its need.` });
+  if (excess > 0) events.push({ lvl: damage > 20 ? 'bad' : 'warn', t: `Sluice release of ${release.toFixed(0)} Mm³ exceeded the Mahaica limit by ${excess.toFixed(0)} Mm³. Flood damage: ${damage.toFixed(0)} points.` });
+  if (release < dec.op.release - 0.5) events.push({ lvl: 'info', t: `Operator asked for ${dec.op.release} Mm³ but only ${release.toFixed(0)} Mm³ could be released.` });
+  if (S1 < P.healthy) events.push({ lvl: 'warn', t: `Storage below the wetland health level (${P.healthy} Mm³). Ecosystem stressed.` });
+  if (cN > P.nPoor) events.push({ lvl: 'bad', t: `Algal bloom risk: conservancy nitrogen ${cN.toFixed(2)} mg/L.${!season.wet && S1 < 150 ? ' Low water is concentrating the nutrients.' : ''}` });
+  else if (cN > P.nGood) events.push({ lvl: 'warn', t: `Nitrogen rising in the conservancy: ${cN.toFixed(2)} mg/L.` });
+  if (cT > P.tssPoor) events.push({ lvl: 'bad', t: `Muddy water: suspended sediment ${cT.toFixed(0)} mg/L. Fish habitat smothered; GWI treatment costs up.` });
+  else if (cT > P.tssGood) events.push({ lvl: 'warn', t: `Turbidity rising: suspended sediment ${cT.toFixed(0)} mg/L.` });
+  if (treat > 0.5) events.push({ lvl: 'warn', t: `GWI spent ${treat.toFixed(0)} points extra on treatment because of poorer source water.` });
+  if (livestockHit && act > 0) events.push({ lvl: 'bad', t: `Released water was polluted: Mahaica livestock harmed (−${livestock.toFixed(0)} points).` });
+  if (coastStatus === 'poor') events.push({ lvl: 'bad', t: `${coastN.toFixed(0)} t of nitrogen reached the estuary. Risk of algal blooms and fish kills along the coast.` });
+  else if (coastStatus === 'caution') events.push({ lvl: 'warn', t: `${coastN.toFixed(0)} t of nitrogen reached the estuary. Marine ecosystem under pressure.` });
+  if (capOn && (dec.rice.fert === 'high' || dec.sugar.fert === 'high')) events.push({ lvl: 'info', t: 'EPA fertilizer cap applied: high application on coastal farms was reduced to medium.' });
+  if (!events.length) events.push({ lvl: 'good', t: 'All demands met, dam safe, water clean, coast healthy. A good season.' });
+
+  return {
+    r, season: season.name, months: season.months, wet: season.wet, clim, forecast: world.forecast[r],
+    S0, inflow, upMult, evap, floor, avail, dem, del, delivered, gwiNeed, gwiFrac,
+    releaseReq: dec.op.release, release, overtop, breach, S1, pctMet, excess, damage,
+    cN0: st.MN / S0, cT0: st.MT / S0, cN, cT, MN1, MT1,
+    loadN_bg, loadN_up, loadT_bg, loadT_mine, loadT_land, coastFarmN, coastRelN, coastN,
+    qStatus, coastStatus, treat, livestock, livestockHit, up, fertR, fertS,
+    pts, events, dec,
+    next: { S: S1, MN: MN1, MT: MT1 }
+  };
+}
+
+if (typeof module !== 'undefined') module.exports = { DEFAULTS, FERT, UP_SCENARIOS, makeWorld, simulateSeason, seasonDemands, allocate, initialState, upstreamOf };
+
+</script>
+<script>
+const TEAMS = [
+  { k:'gwi',     name:'GWI',                  role:'Georgetown drinking water supply', c:'--t-gwi' },
+  { k:'rice',    name:'Rice farmers',         role:'Irrigation of coastal rice lands', c:'--t-rice' },
+  { k:'sugar',   name:'Sugar estate',         role:'Irrigation of cane fields', c:'--t-sugar' },
+  { k:'op',      name:'Conservancy operator', role:'Dam safety and relief sluices', c:'--t-op' },
+  { k:'mahaica', name:'Mahaica communities',  role:'Villages, farms and livestock downstream of the sluices', c:'--t-mahaica' },
+  { k:'env',     name:'Environment (EPA)',    role:'Wetland, water quality and coastal ecosystems', c:'--t-env' },
+  { k:'upfarm',  name:'Upstream farmers',     role:'Farms in the conservancy catchment', c:'--t-upfarm', up:true },
+  { k:'upmine',  name:'Upstream miners',      role:'Gold mining in the conservancy catchment', c:'--t-upmine', up:true }
+];
+const FERT_LABEL = { low:'Low', med:'Medium', high:'High' };
+const clone = o => JSON.parse(JSON.stringify(o));
+let P = clone(DEFAULTS), world = makeWorld(P), history = [], dec = defaultDec();
+function defaultDec(){ return { rule:'proportional', gwi:{request:15, leak:false}, rice:{area:15, fert:'med'}, sugar:{area:8, fert:'med'}, op:{release:20}, mahaica:{activity:60}, env:{reserve:90, rule:'none'}, up:{mode:'current', areaU:4, fertU:'med', mine:1, ponds:false} }; }
+const $ = id => document.getElementById(id);
+const f0 = x => (Math.round(x)).toLocaleString('en-US');
+const r = () => history.length;
+const ST = () => history.length ? history[history.length-1].next : initialState(P);
+const S = () => ST().S;
+const leakSavings = () => Math.min(P.gwiDemand, history.filter(h => h.dec.gwi.leak).length * P.leakSave);
+const upPlayedEver = () => dec.up.mode === 'played' || history.some(h => h.up.played);
+const visibleTeams = () => TEAMS.filter(t => !t.up || upPlayedEver());
+const totals = () => { const t = {}; TEAMS.forEach(tm => t[tm.k] = 0); history.forEach(h => { for (const k in t) t[k] += h.pts[k] || 0; }); return t; };
+const climClass = c => c === 'El Niño' ? 'dry' : c === 'La Niña' ? 'wet' : 'norm';
+const climLabel = c => c === 'El Niño' ? 'El Niño · below-normal rain' : c === 'La Niña' ? 'La Niña · well above-normal rain' : 'Normal rain';
+const qWord = s => s === 'good' ? 'Good' : s === 'caution' ? 'Caution' : 'Poor';
+const statusN = c => c > P.nPoor ? 'poor' : c > P.nGood ? 'caution' : 'good';
+const statusT = c => c > P.tssPoor ? 'poor' : c > P.tssGood ? 'caution' : 'good';
+
+/* ---------- team cards ---------- */
+function slider(id, label, min, max, step, val, unit){
+  return `<div class="ctrl"><label for="${id}"><span>${label}</span><output id="${id}-o">${val} ${unit}</output></label>
+  <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+}
+function fertSelect(id){
+  return `<div class="selrow"><label for="${id}">Fertilizer rate</label><select id="${id}"><option value="low">Low (less yield)</option><option value="med">Medium</option><option value="high">High (more yield)</option></select></div>`;
+}
+function card(t, body){
+  return `<article class="card" style="--c:var(${t.c})"><div class="who"><div><h3>${t.name}</h3><div class="role">${t.role}</div></div><span class="total" id="tot-${t.k}"></span></div>${body}<div class="preview" id="pv-${t.k}"></div></article>`;
+}
+function buildCards(){
+  const b = {};
+  b.gwi = slider('gwi-request','Abstraction request',0,30,1,dec.gwi.request,'Mm³') +
+    `<label class="check" for="gwi-leak"><input type="checkbox" id="gwi-leak"> <span>Invest in leak repair this season (costs ${P.leakCost} points; need falls by ${P.leakSave} Mm³ for the rest of the game)</span></label>`;
+  b.rice = slider('rice-area','Area planted',0,25,1,dec.rice.area,'k ha') + fertSelect('rice-fert');
+  b.sugar = slider('sugar-area','Cane area irrigated',0,15,1,dec.sugar.area,'k ha') + fertSelect('sugar-fert');
+  b.op = slider('op-release','Release through relief sluices',0,P.sluiceCap,5,dec.op.release,'Mm³') +
+    `<div class="hint">Mahaica River safe limit: ${P.mahaicaThreshold} Mm³ per season. Dam is unsafe above ${P.sSafe} Mm³ and overtops at ${P.sMax}. Released water carries the conservancy's pollution downstream.</div>`;
+  b.mahaica = slider('mahaica-activity','Farming and livestock in the floodplain',0,100,10,dec.mahaica.activity,'%') +
+    `<div class="hint">More activity earns more, and loses more if the operator floods the river or releases polluted water.</div>`;
+  b.env = slider('env-reserve','Protected minimum storage',P.sDead,200,5,dec.env.reserve,'Mm³') +
+    `<div class="selrow"><label for="env-rule">Rule for coastal farms</label><select id="env-rule"><option value="none">No rule</option><option value="buffer">Require buffer strips</option><option value="cap">Cap fertilizer at medium</option></select></div>
+     <div class="hint">EPA can regulate coastal farms only. It has no authority over the upstream basin.</div>`;
+  $('teams').innerHTML = TEAMS.filter(t => !t.up).map(t => card(t, b[t.k])).join('');
+  const bind = (id, fn, unit) => { const el = $(id); el.addEventListener('input', () => { fn(Number(el.value)); $(id+'-o').textContent = el.value + ' ' + unit; updatePreviews(); }); };
+  bind('gwi-request', v => dec.gwi.request = v, 'Mm³');
+  bind('rice-area', v => dec.rice.area = v, 'k ha');
+  bind('sugar-area', v => dec.sugar.area = v, 'k ha');
+  bind('op-release', v => dec.op.release = v, 'Mm³');
+  bind('mahaica-activity', v => dec.mahaica.activity = v, '%');
+  bind('env-reserve', v => dec.env.reserve = v, 'Mm³');
+  $('gwi-leak').addEventListener('change', e => { dec.gwi.leak = e.target.checked; updatePreviews(); });
+  $('rice-fert').addEventListener('change', e => { dec.rice.fert = e.target.value; updatePreviews(); });
+  $('sugar-fert').addEventListener('change', e => { dec.sugar.fert = e.target.value; updatePreviews(); });
+  $('env-rule').addEventListener('change', e => { dec.env.rule = e.target.value; updatePreviews(); });
+}
+function buildUpstream(){
+  if (dec.up.mode !== 'played'){
+    const s = UP_SCENARIOS[dec.up.mode];
+    $('upbody').innerHTML = `<p style="margin:0" class="hint">Nobody at the table controls the upstream basin this season. It is running as <strong>${s.label}</strong>:</p>
+      <div class="upfixed">
+        <div>Farmland in the catchment<b>${s.areaU} k ha</b></div>
+        <div>Upstream fertilizer<b>${FERT_LABEL[s.fertU]}</b></div>
+        <div>Mining<b>${MINE_LABELS[s.mine]}</b></div>
+        <div>Settling ponds<b>${s.ponds ? 'Yes' : 'No'}</b></div>
+      </div>`;
+    return;
+  }
+  const tf = TEAMS.find(t => t.k==='upfarm'), tm = TEAMS.find(t => t.k==='upmine');
+  $('upbody').innerHTML = `<div class="teams">` +
+    card(tf, slider('up-area','Farmland in the catchment',0,12,1,dec.up.areaU,'k ha') + fertSelect('up-fert') +
+      `<div class="hint">Clearing land speeds up runoff: more water in wet seasons, less in dry seasons, and more sediment.</div>`) +
+    card(tm, `<div class="selrow"><label for="up-mine">Mining activity</label><select id="up-mine">${MINE_LABELS.map((l,i)=>`<option value="${i}">${l}</option>`).join('')}</select></div>
+      <label class="check" for="up-ponds"><input type="checkbox" id="up-ponds"> <span>Use settling ponds (removes ${Math.round(P.pondRemoval*100)}% of sediment; costs ${P.pondCost} points per season)</span></label>
+      <div class="hint">Earnings: ${P.mineEarn.slice(1).join(', ')} points per season for small, medium and large-scale mining.</div>`) + `</div>`;
+  const a = $('up-area');
+  a.addEventListener('input', () => { dec.up.areaU = Number(a.value); $('up-area-o').textContent = a.value + ' k ha'; updatePreviews(); });
+  $('up-fert').value = dec.up.fertU; $('up-fert').addEventListener('change', e => { dec.up.fertU = e.target.value; updatePreviews(); });
+  $('up-mine').value = String(dec.up.mine); $('up-mine').addEventListener('change', e => { dec.up.mine = Number(e.target.value); updatePreviews(); });
+  $('up-ponds').checked = dec.up.ponds; $('up-ponds').addEventListener('change', e => { dec.up.ponds = e.target.checked; updatePreviews(); });
+}
+function syncCards(){
+  const set = (id, v, unit) => { $(id).value = v; $(id+'-o').textContent = v + ' ' + unit; };
+  set('gwi-request', dec.gwi.request, 'Mm³'); set('rice-area', dec.rice.area, 'k ha'); set('sugar-area', dec.sugar.area, 'k ha');
+  set('op-release', dec.op.release, 'Mm³'); set('mahaica-activity', dec.mahaica.activity, '%'); set('env-reserve', dec.env.reserve, 'Mm³');
+  $('gwi-leak').checked = dec.gwi.leak; $('rule').value = dec.rule;
+  $('rice-fert').value = dec.rice.fert; $('sugar-fert').value = dec.sugar.fert; $('env-rule').value = dec.env.rule;
+  $('upmode').value = dec.up.mode; buildUpstream();
+}
+function updatePreviews(){
+  const done = r() >= P.rounds, rr = Math.min(r(), P.rounds-1), season = P.seasons[rr%4];
+  const d = seasonDemands(P, rr, dec);
+  const exp = season.wet ? P.exportWet : P.exportDry;
+  const need = Math.max(0, P.gwiDemand - leakSavings() - (dec.gwi.leak ? P.leakSave : 0));
+  $('pv-gwi').textContent = `Need this season: ${f0(Math.max(0,P.gwiDemand - leakSavings()))} Mm³` + (dec.gwi.leak ? ` (${f0(need)} after this repair)` : '');
+  const cut = dec.env.rule === 'buffer' ? 1 - P.bufferCut : 1;
+  const fR = dec.env.rule === 'cap' && dec.rice.fert === 'high' ? 'med' : dec.rice.fert;
+  const fS = dec.env.rule === 'cap' && dec.sugar.fert === 'high' ? 'med' : dec.sugar.fert;
+  $('pv-rice').textContent = `Water demand ${d.rice.toFixed(1)} Mm³ · about ${f0(dec.rice.area*FERT[fR].rice*exp*cut)} t N to the coast`;
+  $('pv-sugar').textContent = `Water demand ${d.sugar.toFixed(1)} Mm³ · about ${f0(dec.sugar.area*FERT[fS].sugar*exp*cut)} t N to the coast`;
+  $('pv-op').textContent = `Users are requesting ${(d.gwi + d.rice + d.sugar).toFixed(1)} Mm³ in total`;
+  const ex = Math.max(0, dec.op.release - P.mahaicaThreshold);
+  $('pv-mahaica').textContent = ex > 0 ? `At the planned release: ${(ex*P.floodDamage*dec.mahaica.activity/100).toFixed(0)} points of flood damage` : `Planned release is within the river's safe limit`;
+  const floor = Math.max(P.sDead, dec.env.reserve);
+  $('pv-env').textContent = `Water locked below ${floor} Mm³; ${Math.max(0, S()-floor).toFixed(0)} Mm³ of current storage is above it`;
+  if ($('pv-upfarm')) $('pv-upfarm').textContent = `About ${f0(dec.up.areaU*FERT[dec.up.fertU].up*exp)} t N into the conservancy this season · earns ${f0(dec.up.areaU*(P.upRev*FERT[dec.up.fertU].yield-P.upCost-FERT[dec.up.fertU].cost))} pts`;
+  if ($('pv-upmine')) $('pv-upmine').textContent = `About ${f0(P.mineSed[dec.up.mine]*(season.wet?1.5:0.5)*(dec.up.ponds?1-P.pondRemoval:1))} t sediment into the conservancy this season`;
+  const t = totals();
+  TEAMS.forEach(tm => { const el = $('tot-'+tm.k); if (el) el.textContent = history.length ? `${f0(t[tm.k])} pts` : ''; });
+  document.querySelectorAll('#teams input, #teams select, #upbody input, #upbody select').forEach(i => i.disabled = done);
+  $('rule').disabled = done; $('upmode').disabled = done;
+}
+
+/* ---------- status strip ---------- */
+function gaugeSVG(s){
+  const H=150, W=56, top=P.sMax*1.08, y = v => 8 + (1 - v/top)*(H-16);
+  const lines = [[P.sMax,'var(--bad)'],[P.sSafe,'var(--warn)'],[P.healthy,'var(--good)'],[P.sDead,'var(--muted)']]
+    .map(([v,c]) => `<line x1="2" x2="${W-2}" y1="${y(v)}" y2="${y(v)}" stroke="${c}" stroke-width="1.5" stroke-dasharray="4 3"/>`).join('');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Storage ${f0(s)} million cubic metres">
+    <rect x="1" y="8" width="${W-2}" height="${H-16}" rx="6" fill="var(--bg)" stroke="var(--line)"/>
+    <rect x="3" y="${y(s)}" width="${W-6}" height="${Math.max(0,H-8-y(s)-2)}" rx="4" fill="var(--water)" opacity=".85"/>${lines}</svg>
+    <div><div class="num" style="font-size:28px;font-weight:500">${f0(s)}</div><div class="hint">Mm³ in storage</div></div>`;
+}
+function renderStatus(){
+  const st = ST();
+  $('gauge').innerHTML = gaugeSVG(st.S);
+  const cN = st.MN/st.S, cT = st.MT/st.S;
+  $('qMeta').innerHTML = `<span>Conservancy water: <span class="q ${statusN(cN)}">Nitrogen ${cN.toFixed(2)} mg/L</span> <span class="q ${statusT(cT)}">Sediment ${f0(cT)} mg/L</span></span>`;
+  const done = r() >= P.rounds;
+  if (done){
+    $('seasonTitle').textContent = 'Game over: debrief time';
+    $('seasonMeta').innerHTML = `<span>${P.rounds} seasons played</span>`;
+  } else {
+    const rr = r(), s = P.seasons[rr%4], yr = Math.floor(rr/4)+1, fc = world.forecast[rr];
+    $('seasonTitle').textContent = `Season ${rr+1} of ${P.rounds}: ${s.name} (${s.months}), year ${yr}`;
+    $('seasonMeta').innerHTML = `<span>Rainfall outlook: <span class="chip ${climClass(fc)}">${climLabel(fc)}</span></span><span>Typical inflow ${s.inflow} Mm³, evaporation ${s.evap} Mm³</span>`;
+  }
+  $('runBtn').disabled = done; $('undoBtn').disabled = !history.length;
+}
+
+/* ---------- results ---------- */
+function renderResults(){
+  const h = history[history.length-1];
+  if (!h){
+    $('balTitle').textContent = 'Water balance'; $('outTitle').textContent = 'Stakeholder outcomes'; $('qualTitle').textContent = 'Water quality';
+    $('balance').innerHTML = `<p class="empty">Run the first season to see where the water went.</p>`;
+    $('outcomes').innerHTML = `<p class="empty">Each team's demand, what it received, and its points will appear here.</p>`;
+    $('quality').innerHTML = `<p class="empty">Pollution loads, conservancy concentrations and what reaches the coast will appear here.</p>`;
+    $('banner').innerHTML = `<div class="banner">Start: the conservancy holds <strong class="num">${f0(P.s0)} Mm³</strong>. Read the outlook, let teams negotiate, set the decisions below, then run the season.</div>`;
+    return;
+  }
+  $('balTitle').textContent = `Water balance, season ${h.r+1}`;
+  $('outTitle').textContent = `Stakeholder outcomes, season ${h.r+1}`;
+  $('qualTitle').textContent = `Water quality, season ${h.r+1}`;
+  $('banner').innerHTML = r() >= P.rounds ? `<div class="banner over">All ${P.rounds} seasons played. Basin total: <strong class="num">${f0(Object.values(totals()).reduce((a,b)=>a+b,0))}</strong> points. Open the facilitator guide for debrief questions.</div>` : '';
+  const row = (l, v, cls='') => `<tr class="${cls}"><td>${l}</td><td class="r num">${v}</td></tr>`;
+  const upNote = Math.abs(h.upMult-1) > 0.005 ? ` <span class="hint">(upstream land use changed it by ${h.upMult>1?'+':''}${((h.upMult-1)*100).toFixed(0)}%)</span>` : '';
+  $('balance').innerHTML = `<p class="hint" style="margin:2px 0 8px">Actual climate: <span class="chip ${climClass(h.clim)}">${climLabel(h.clim)}</span>${h.forecast!==h.clim?' <span class="neg">(forecast was wrong)</span>':''}</p>
+  <table>
+    ${row('Storage at start', f0(h.S0))}
+    ${row('+ Inflow from catchment' + upNote, f0(h.inflow))}
+    ${row('− Evaporation', f0(h.evap))}
+    ${row('− Delivered to users', f0(h.delivered))}
+    ${row('− Released through sluices', f0(h.release))}
+    ${row('− Overtopped the dam', f0(h.overtop), h.overtop>0?'neg':'')}
+    ${row('= Storage at end', f0(h.S1), 'total')}
+  </table>
+  <p class="hint" style="margin:10px 0 0">Total requested ${f0(h.dem.gwi+h.dem.rice+h.dem.sugar)} Mm³; available above the protected floor of ${f0(h.floor)}: ${f0(h.avail)} Mm³. Deficit: <strong class="num ${h.pctMet<0.999?'neg':''}">${f0(h.dem.gwi+h.dem.rice+h.dem.sugar-h.delivered)} Mm³</strong>.</p>`;
+
+  const t = totals();
+  const decTxt = { gwi:`Requested ${h.dec.gwi.request} Mm³${h.dec.gwi.leak?' + leak repair':''}`, rice:`${h.dec.rice.area}k ha · ${FERT_LABEL[h.fertR].toLowerCase()} fertilizer`, sugar:`${h.dec.sugar.area}k ha · ${FERT_LABEL[h.fertS].toLowerCase()} fertilizer`, op:`Release ${h.dec.op.release} Mm³`, mahaica:`${h.dec.mahaica.activity}% floodplain use`, env:`Reserve ${h.dec.env.reserve} Mm³ · ${h.dec.env.rule==='buffer'?'buffer strips':h.dec.env.rule==='cap'?'fertilizer cap':'no farm rule'}`,
+    upfarm:`${h.up.areaU}k ha · ${FERT_LABEL[h.up.fertU].toLowerCase()} fertilizer`, upmine:`${MINE_LABELS[h.up.mine]}${h.up.ponds?' + ponds':''}` };
+  const dm = { gwi:[h.gwiNeed, h.del.gwi], rice:[h.dem.rice, h.del.rice], sugar:[h.dem.sugar, h.del.sugar] };
+  const rows = TEAMS.filter(tm => !tm.up || h.up.played).map(tm => {
+    const d = dm[tm.k];
+    let dcell = '—', gcell = '—', mcell = '';
+    if (d){ const pct = d[0]>0 ? Math.min(1, d[1]/d[0]) : 1; dcell = d[0].toFixed(1); gcell = d[1].toFixed(1); mcell = `<div class="bar" style="--c:var(${tm.c})" title="${(pct*100).toFixed(0)}%"><i style="width:${pct*100}%"></i></div>`; }
+    if (tm.k==='gwi' && h.treat > 0.5) mcell += `<div class="hint neg">Treatment −${f0(h.treat)}</div>`;
+    if (tm.k==='op') mcell = `<span class="hint">End storage ${f0(h.S1)}</span>`;
+    if (tm.k==='mahaica') mcell = (h.damage>0 ? `<span class="neg">Flooded −${f0(h.damage)}</span>` : `<span class="hint">River safe</span>`) + (h.livestock>0 ? `<div class="neg">Livestock −${f0(h.livestock)}</div>` : '');
+    if (tm.k==='env') mcell = `<span class="${h.S1>=P.healthy?'pos':'neg'}">Wetland ${h.S1>=P.healthy?'healthy':'stressed'}</span><div class="hint">Water ${qWord(h.qStatus).toLowerCase()} · coast ${qWord(h.coastStatus).toLowerCase()}</div>`;
+    if (tm.k==='upfarm') mcell = `<span class="hint">${f0(h.loadN_up)} t N sent down</span>`;
+    if (tm.k==='upmine') mcell = `<span class="hint">${f0(h.loadT_mine)} t sediment sent down</span>`;
+    const p = h.pts[tm.k];
+    return `<tr><td><span class="dot" style="--c:var(${tm.c})"></span>${tm.name}<div class="hint">${decTxt[tm.k]}</div></td><td class="r num">${dcell}</td><td class="r num">${gcell}</td><td>${mcell}</td><td class="r num ${p<0?'neg':'pos'}">${p>0?'+':''}${f0(p)}</td><td class="r num">${f0(t[tm.k])}</td></tr>`;
+  }).join('');
+  $('outcomes').innerHTML = `<table><thead><tr><th>Team</th><th class="r">Need, Mm³</th><th class="r">Got, Mm³</th><th>Result</th><th class="r">Season</th><th class="r">Total</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+  const src = h.up.played ? 'upstream teams' : UP_SCENARIOS[h.dec.up.mode].label.toLowerCase();
+  $('quality').innerHTML = `<table>
+    <thead><tr><th>Conservancy</th><th class="r">Start</th><th class="r">End</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Nitrogen, mg/L</td><td class="r num">${h.cN0.toFixed(2)}</td><td class="r num">${h.cN.toFixed(2)}</td><td><span class="q ${statusN(h.cN)}">${qWord(statusN(h.cN))}</span></td></tr>
+      <tr><td>Suspended sediment, mg/L</td><td class="r num">${f0(h.cT0)}</td><td class="r num">${f0(h.cT)}</td><td><span class="q ${statusT(h.cT)}">${qWord(statusT(h.cT))}</span></td></tr>
+    </tbody></table>
+  <table>
+    <thead><tr><th>Loads this season</th><th class="r">Tonnes</th></tr></thead>
+    <tbody>
+      <tr><td>Nitrogen into the conservancy from natural runoff</td><td class="r num">${f0(h.loadN_bg)}</td></tr>
+      <tr><td>Nitrogen into the conservancy from upstream farms <span class="hint">(${src})</span></td><td class="r num">${f0(h.loadN_up)}</td></tr>
+      <tr><td>Sediment into the conservancy: natural / cleared land / mining</td><td class="r num">${f0(h.loadT_bg)} / ${f0(h.loadT_land)} / ${f0(h.loadT_mine)}</td></tr>
+      <tr><td>Nitrogen to the estuary from coastal farm drainage</td><td class="r num">${f0(h.coastFarmN)}</td></tr>
+      <tr><td>Nitrogen to the estuary in released and overtopped water</td><td class="r num">${f0(h.coastRelN)}</td></tr>
+      <tr class="total"><td>Total nitrogen reaching the estuary <span class="q ${h.coastStatus}" style="margin-left:6px">${qWord(h.coastStatus)}</span></td><td class="r num">${f0(h.coastN)}</td></tr>
+    </tbody></table>`;
+}
+
+function lineChart({ values, top, thresholds, W=760, H=270, L=48, R=150, T=14, B=34, fmt=v=>v, color='var(--water)', strip=true, labelEnd=true, step }){
+  const x = i => L + i*(W-L-R)/P.rounds, y = v => T + (1 - v/top)*(H-T-B);
+  let g = '';
+  const st = step || top/5;
+  for (let v=0; v<=top+1e-9; v+=st) g += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${fmt(v)}</text>`;
+  for (let i=0; i<=P.rounds; i++) g += `<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${i===0?'Start':'S'+i}</text>`;
+  thresholds.forEach(([v,l,c]) => g += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${c}" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${W-R+8}" y="${y(v)+4}" font-size="12" fill="${c}">${l}</text>`);
+  const pts = values.map(([i,v]) => [i, Math.min(v, top)]);
+  let body = '';
+  if (pts.length){
+    const line = pts.map(([i,v]) => `${x(i)},${y(v)}`).join(' ');
+    body += `<polygon points="${x(pts[0][0])},${y(0)} ${line} ${x(pts[pts.length-1][0])},${y(0)}" fill="${color}" opacity=".12"/><polyline points="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    body += pts.map(([i,v],j) => `<circle cx="${x(i)}" cy="${y(v)}" r="${j===pts.length-1?5:3.5}" fill="${color}" stroke="var(--surface)" stroke-width="1.5"><title>${i===0?'Start':'Season '+i}: ${fmt(values[j][1])}</title></circle>`).join('');
+    const last = values[values.length-1];
+    if (labelEnd) body += `<text x="${x(last[0])}" y="${y(Math.min(last[1],top))-10}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">${fmt(last[1])}</text>`;
+  }
+  if (strip) history.forEach((h,i) => { const c = h.clim==='El Niño'?'var(--warn)':h.clim==='La Niña'?'var(--water)':'var(--line)'; body += `<rect x="${x(i)+2}" y="${H-B+4}" width="${x(1)-x(0)-4}" height="4" rx="2" fill="${c}"><title>Season ${i+1}: ${h.clim}</title></rect>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img">${g}${body}</svg>`;
+}
+function renderChart(){
+  const top = Math.ceil(P.sMax*1.1/50)*50;
+  const vals = [[0,P.s0], ...history.map((h,i) => [i+1, h.S1])];
+  $('chart').innerHTML = `<div class="scroll"><div style="min-width:560px">${lineChart({ values: vals, top, step: 50, fmt: v => f0(v),
+    thresholds: [[P.sMax,'Dam overtops '+P.sMax,'var(--bad)'],[P.sSafe,'Safe limit '+P.sSafe,'var(--warn)'],[P.healthy,'Wetland health '+P.healthy,'var(--good)'],[P.sDead,'Dead storage '+P.sDead,'var(--muted)']] })}</div></div>
+  <p class="hint" style="margin:4px 0 0">Coloured strip under each season: amber El Niño, blue La Niña, grey normal.</p>`;
+  const st0 = initialState(P);
+  const nVals = [[0, st0.MN/st0.S], ...history.map((h,i) => [i+1, h.cN])];
+  const tVals = [[0, st0.MT/st0.S], ...history.map((h,i) => [i+1, h.cT])];
+  const cVals = history.map((h,i) => [i+1, h.coastN]);
+  const mini = { W:360, H:200, L:44, R:14, T:10, B:30, strip:false };
+  const topN = Math.max(P.nPoor*1.5, ...nVals.map(v=>v[1]))*1.05, topT = Math.max(P.tssPoor*1.5, ...tVals.map(v=>v[1]))*1.05, topC = Math.max(P.coastPoor*1.3, ...cVals.map(v=>v[1]))*1.05;
+  $('qcharts').innerHTML =
+    `<div><h3>Conservancy nitrogen, mg/L</h3>${lineChart({ ...mini, values:nVals, top:topN, fmt:v=>v.toFixed(1), color:'var(--t-rice)', thresholds:[[P.nGood,'','var(--warn)'],[P.nPoor,'','var(--bad)']] })}</div>
+     <div><h3>Conservancy sediment, mg/L</h3>${lineChart({ ...mini, values:tVals, top:topT, fmt:v=>f0(v), color:'var(--t-upmine)', thresholds:[[P.tssGood,'','var(--warn)'],[P.tssPoor,'','var(--bad)']] })}</div>
+     <div><h3>Nitrogen to the estuary, t</h3>${lineChart({ ...mini, values:cVals, top:topC, fmt:v=>f0(v), color:'var(--t-mahaica)', thresholds:[[P.coastGood,'','var(--warn)'],[P.coastPoor,'','var(--bad)']] })}</div>`;
+}
+
+function renderScores(){
+  const t = totals(), teams = visibleTeams(), vals = teams.map(tm => t[tm.k]), mn = Math.min(0,...vals), mx = Math.max(1,...vals), span = mx - mn;
+  const pos = v => (v - mn)/span*100;
+  $('scores').innerHTML = teams.map(tm => { const v = t[tm.k], a = pos(Math.min(0,v)), b = pos(Math.max(0,v));
+    return `<div class="score" style="--c:var(${tm.c})"><span><span class="dot"></span>${tm.name}</span><div class="scorebar"><i style="left:${a}%;width:${b-a}%"></i><span class="zero" style="left:${pos(0)}%"></span></div><span class="num" style="text-align:right">${f0(v)}</span></div>`; }).join('');
+  const down = ['gwi','rice','sugar','op','mahaica','env'].reduce((s,k)=>s+t[k],0), upt = t.upfarm + t.upmine;
+  const dem = history.reduce((s,h)=>s+h.dem.gwi+h.dem.rice+h.dem.sugar,0), got = history.reduce((s,h)=>s+h.delivered,0);
+  const poorQ = history.filter(h=>h.qStatus==='poor').length, poorC = history.filter(h=>h.coastStatus==='poor').length;
+  $('basinTotal').innerHTML = history.length ? `Downstream total <strong class="num">${f0(down)}</strong> points${upPlayedEver()?`; upstream total <strong class="num">${f0(upt)}</strong>`:''}. Users received <strong class="num">${dem>0?(got/dem*100).toFixed(0):100}%</strong> of the water they requested (deficit ${f0(dem-got)} Mm³); ${history.filter(h=>h.breach).length} dam breach(es); ${history.filter(h=>h.damage>0).length} season(s) of Mahaica flooding; ${poorQ} season(s) of poor conservancy water; ${poorC} season(s) of poor coastal water.` : 'Scores are on different scales for each role. Compare teams with how they did in earlier seasons, and watch the basin totals.';
+}
+function renderLog(){
+  if (!history.length){ $('log').innerHTML = `<li class="info">Waiting for season 1.</li>`; return; }
+  $('log').innerHTML = history.slice().reverse().flatMap(h => h.events.map(e => `<li class="${e.lvl}"><b>S${h.r+1}</b>${e.t}</li>`)).join('');
+}
+function renderCSV(){
+  const head = ['season','name','forecast','climate','rule','upstream','up_area_kha','up_fert','mining','ponds','start','inflow','evap','gwi_request','gwi_need','gwi_got','rice_kha','rice_fert','rice_demand','rice_got','sugar_kha','sugar_fert','sugar_demand','sugar_got','release_requested','release','overtop','end','deficit','N_mgL','TSS_mgL','N_load_up_t','TSS_load_mine_t','coast_N_t','mahaica_damage','gwi_treatment','pts_gwi','pts_rice','pts_sugar','pts_operator','pts_mahaica','pts_env','pts_upfarm','pts_upmine'];
+  const rows = history.map(h => [h.r+1, h.season, h.forecast, h.clim, h.dec.rule, h.dec.up.mode, h.up.areaU, h.up.fertU, MINE_LABELS[h.up.mine], h.up.ponds?'yes':'no', h.S0, h.inflow, h.evap, h.dec.gwi.request, h.gwiNeed, h.del.gwi, h.dec.rice.area, h.fertR, h.dem.rice, h.del.rice, h.dec.sugar.area, h.fertS, h.dem.sugar, h.del.sugar, h.releaseReq, h.release, h.overtop, h.S1, h.dem.gwi+h.dem.rice+h.dem.sugar-h.delivered, h.cN, h.cT, h.loadN_up, h.loadT_mine, h.coastN, h.damage, h.treat, h.pts.gwi, h.pts.rice, h.pts.sugar, h.pts.op, h.pts.mahaica, h.pts.env, h.pts.upfarm, h.pts.upmine].map(v => typeof v==='number' ? Math.round(v*100)/100 : v).join(','));
+  $('csv').value = [head.join(','), ...rows].join('\n');
+}
+function renderAll(){ renderStatus(); updatePreviews(); renderResults(); renderChart(); renderScores(); renderLog(); renderCSV(); }
+
+/* ---------- settings ---------- */
+const FIELDS = [
+  ['rounds','Seasons in the game'],['seed','Random seed'],['forecastSkill','Forecast accuracy (0–1)'],['noise','Inflow noise (±fraction)'],
+  ['s0','Starting storage'],['sDead','Dead storage'],['healthy','Wetland health level'],['sSafe','Safe operating limit'],['sMax','Dam overtops at'],
+  ['sluiceCap','Sluice capacity per season'],['mahaicaThreshold','Mahaica safe release'],['gwiDemand','GWI need per season'],['leakSave','Leak repair saving'],['leakCost','Leak repair cost (points)'],
+  ['riceRate','Rice water use per k ha'],['riceRev','Rice revenue per k ha'],['riceCost','Rice cost per k ha'],
+  ['sugarRate','Sugar water use per k ha'],['sugarRev','Sugar revenue per k ha'],['sugarCost','Sugar cost per k ha'],
+  ['mahaicaIncome','Mahaica income at 100%'],['floodDamage','Flood damage per Mm³ excess'],
+  ['n0','Starting nitrogen, mg/L'],['tss0','Starting sediment, mg/L'],['bgN','Natural nitrogen in inflow, mg/L'],['bgTSS','Natural sediment in inflow, mg/L'],
+  ['kN','Nitrogen removed per season (0–1)'],['kTSS','Sediment settled per season (0–1)'],['exportWet','N washed off, wet season (0–1)'],['exportDry','N washed off, dry season (0–1)'],
+  ['nGood','Nitrogen caution above, mg/L'],['nPoor','Nitrogen poor above, mg/L'],['tssGood','Sediment caution above, mg/L'],['tssPoor','Sediment poor above, mg/L'],
+  ['coastGood','Estuary caution above, t N'],['coastPoor','Estuary poor above, t N'],['livestockLoss','Livestock loss (points)'],
+  ['bufferCut','Buffer strip N reduction (0–1)'],['bufferCost','Buffer strip cost per k ha'],['pondRemoval','Settling pond removal (0–1)'],['pondCost','Settling pond cost (points)']
+];
+function buildSettings(){
+  $('settings').innerHTML = FIELDS.map(([k,l]) => `<label for="set-${k}">${l}<input type="number" step="any" id="set-${k}" value="${P[k]}"></label>`).join('') +
+    `<label for="set-mode">Climate<select id="set-mode"><option value="script">Use the script below</option><option value="random">Random each season</option></select></label>`;
+  $('set-mode').value = P.climateMode;
+  $('seasonTable').innerHTML = `<thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Crop water factor</th></tr></thead><tbody>` +
+    P.seasons.map((s,i) => `<tr><td>${s.name}</td><td>${s.months}</td>${['inflow','evap','cropFactor'].map(k => `<td class="r"><input type="number" step="any" id="ss-${i}-${k}" value="${s[k]}" aria-label="${s.name} ${k}" style="width:80px"></td>`).join('')}</tr>`).join('') + `</tbody>`;
+  const n = Math.max(P.rounds, P.script.length);
+  $('scriptBox').innerHTML = Array.from({length:n}, (_,i) => `<label for="sc-${i}">Season ${i+1} (${P.seasons[i%4].name})<select id="sc-${i}">${CLIMS.map(c=>`<option ${P.script[i]===c?'selected':''}>${c}</option>`).join('')}</select></label>`).join('');
+}
+$('applyBtn').addEventListener('click', () => {
+  const np = clone(P);
+  for (const [k,l] of FIELDS){ const v = Number($('set-'+k).value); if (!isFinite(v) || $('set-'+k).value === '') { $('applyMsg').textContent = `Check “${l}”: it must be a number.`; return; } np[k] = v; }
+  np.rounds = Math.max(1, Math.min(24, Math.round(np.rounds)));
+  if (!(np.sDead < np.healthy && np.healthy < np.sSafe && np.sSafe < np.sMax)) { $('applyMsg').textContent = 'Levels must rise in order: dead storage < wetland health < safe limit < overtops.'; return; }
+  np.climateMode = $('set-mode').value;
+  np.seasons.forEach((s,i) => ['inflow','evap','cropFactor'].forEach(k => s[k] = Number($(`ss-${i}-${k}`).value) || 0));
+  const n = Math.max(P.rounds, P.script.length); np.script = Array.from({length:n}, (_,i) => $('sc-'+i).value);
+  while (np.script.length < np.rounds) np.script.push('Normal');
+  P = np; restart(); $('applyMsg').textContent = 'Settings applied. The game has restarted.';
+});
+
+/* ---------- controls ---------- */
+function restart(){ world = makeWorld(P); history = []; dec = defaultDec(); dec.env.reserve = Math.max(P.sDead, Math.min(200, dec.env.reserve)); dec.op.release = Math.min(P.sluiceCap, dec.op.release); buildCards(); buildSettings(); syncCards(); renderAll(); }
+$('rule').addEventListener('change', e => { dec.rule = e.target.value; });
+$('upmode').addEventListener('change', e => { dec.up.mode = e.target.value; buildUpstream(); renderAll(); });
+$('runBtn').addEventListener('click', () => {
+  if (r() >= P.rounds) return;
+  history.push(simulateSeason(P, ST(), r(), clone(dec), world, leakSavings()));
+  dec.gwi.leak = false; syncCards(); renderAll();
+});
+$('undoBtn').addEventListener('click', () => { const h = history.pop(); if (h){ dec = clone(h.dec); syncCards(); } renderAll(); });
+$('resetBtn').addEventListener('click', restart);
+
+/* ---------- table name and results export ---------- */
+let tableName = '';
+try { tableName = localStorage.getItem('cc-table') || ''; } catch(e) {}
+$('tableName').value = tableName;
+$('tableName').addEventListener('input', e => { tableName = e.target.value.trim(); try { localStorage.setItem('cc-table', tableName); } catch(err) {} });
+function fingerprint(o){ const s = JSON.stringify(o); let h = 2166136261; for (let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h>>>0).toString(16); }
+const rnd = (v, d=2) => typeof v === 'number' ? Math.round(v*10**d)/10**d : v;
+function resultsData(){
+  return {
+    app: 'conservancy-council', v: 2, table: tableName || 'Unnamed table', exported: new Date().toISOString(),
+    settings: fingerprint(P), seed: P.seed, rounds: P.rounds,
+    levels: { s0:P.s0, sDead:P.sDead, healthy:P.healthy, sSafe:P.sSafe, sMax:P.sMax, n0:P.n0, tss0:P.tss0, nGood:P.nGood, nPoor:P.nPoor, tssGood:P.tssGood, tssPoor:P.tssPoor, coastGood:P.coastGood, coastPoor:P.coastPoor },
+    seasons: history.map(h => ({
+      r: h.r+1, season: h.season, clim: h.clim, rule: h.dec.rule, up: h.dec.up.mode, upPlayed: h.up.played,
+      riceFert: h.fertR, sugarFert: h.fertS, epa: h.dec.env.rule, release: rnd(h.release,1),
+      S1: rnd(h.S1,1), dem: rnd(h.dem.gwi+h.dem.rice+h.dem.sugar,1), del: rnd(h.delivered,1), breach: h.breach, flood: h.damage > 0,
+      cN: rnd(h.cN), cT: rnd(h.cT,1), coastN: rnd(h.coastN,0), q: h.qStatus, coast: h.coastStatus,
+      pts: Object.fromEntries(Object.entries(h.pts).map(([k,v]) => [k, rnd(v,1)]))
+    }))
+  };
+}
+function resultsCode(){ return 'CC2:' + btoa(unescape(encodeURIComponent(JSON.stringify(resultsData())))); }
+function sendCheck(){
+  if (!history.length) { $('sendMsg').textContent = 'Play at least one season first.'; return false; }
+  if (!tableName) { $('sendMsg').textContent = 'Add a table name at the top first, so the facilitator can tell the results apart.'; $('tableName').focus(); return false; }
+  return true;
+}
+$('dlBtn').addEventListener('click', () => {
+  if (!sendCheck()) return;
+  const blob = new Blob([JSON.stringify(resultsData(), null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'conservancy-council_' + tableName.replace(/[^A-Za-z0-9_-]+/g, '-') + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  $('sendMsg').textContent = `Saved results for ${tableName} (${history.length} seasons). If no file appeared, use Copy results code.`;
+});
+$('codeBtn').addEventListener('click', async () => {
+  if (!sendCheck()) return;
+  const code = resultsCode(); const box = $('codeBox');
+  box.style.display = 'block'; box.value = code;
+  try { await navigator.clipboard.writeText(code); $('sendMsg').textContent = `Results code for ${tableName} copied. Paste it into a message to the facilitator.`; }
+  catch(e) { box.select(); $('sendMsg').textContent = 'The code is selected below: press Ctrl+C (or long-press and copy on a phone).'; }
+});
+$('copyBtn').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('csv').value); $('copyMsg').textContent = 'Copied.'; } catch(e) { $('csv').select(); $('copyMsg').textContent = 'Copy blocked here: the text is selected, press Ctrl+C.'; } });
+restart();
+</script>
+</body>
+</html>

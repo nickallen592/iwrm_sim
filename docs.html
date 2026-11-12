@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conservancy Council: Game Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky contents rail on the left, long-form manual on the right; equations set as numbered display blocks */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --ink:#13242c; --muted:#5a6c74; --line:#d2dde1;
+  --water:#1b6585; --water-soft:#d5e8f0;
+  --good:#2c7a4b; --warn:#a86b12; --bad:#b0352d;
+  --t-gwi:#2b6cb0; --t-rice:#5b8c25; --t-sugar:#b0513a; --t-op:#4b5a6b; --t-mahaica:#12868a; --t-env:#7a5ca8;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --math:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
+    --water:#5ab3d3; --water-soft:#1a3946; --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
+    --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
+  --water:#5ab3d3; --water-soft:#1a3946; --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
+  --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 var(--body)}
+a{color:var(--water)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:52px;width:auto}
+.brand-text{font:600 14px/1.25 var(--display);color:var(--muted)}
+.brand-text strong{display:block;color:var(--ink);font-size:16px}
+.navlink{font:600 14px var(--body);text-decoration:none;border:1px solid var(--water);border-radius:8px;padding:8px 14px}
+.layout{max-width:1180px;margin:0 auto;padding:24px 18px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px}
+nav.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;counter-reset:toc}
+nav.toc li a{display:block;padding:4px 8px;border-radius:6px;text-decoration:none;color:var(--muted)}
+nav.toc li a:hover{background:var(--surface);color:var(--ink)}
+nav.toc .h{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 8px 8px}
+main{min-width:0;max-width:78ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:40px;font-weight:700}
+h2{font-size:26px;font-weight:600;margin:52px 0 12px;padding-top:14px;border-top:1px solid var(--line)}
+h2 .n{font-family:var(--mono);font-size:15px;color:var(--muted);font-weight:500;margin-right:10px}
+h3{font-size:19px;font-weight:600;margin:26px 0 8px}
+p,ul,ol{margin:0 0 12px}
+li{margin-bottom:4px}
+.lede{font-size:18px;color:var(--muted);margin-top:10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font:13px var(--mono);color:var(--muted);margin-top:14px}
+.callout{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--water);border-radius:8px;padding:12px 16px;margin:16px 0}
+.callout.warn{border-left-color:var(--warn)}
+.callout p:last-child{margin:0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0 16px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+td.r,th.r{text-align:right}
+td.num,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto;margin:0 0 16px}
+.scroll table{margin:0;min-width:560px}
+code{font:14px var(--mono);background:var(--surface);border:1px solid var(--line);padding:0 5px;border-radius:4px}
+.eq{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:12px 0}
+.eq .f{font:19px/1.6 var(--math);overflow-x:auto}
+.eq .f i{font-style:italic}
+.eq .tag{font:13px var(--mono);color:var(--muted)}
+sub,sup{font-size:.7em;line-height:0}
+.where{font-size:14.5px;color:var(--muted);margin:-4px 0 14px}
+.where b{color:var(--ink);font-family:var(--math);font-style:italic;font-weight:400}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c);margin-right:7px;vertical-align:baseline}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:12px 0}
+.role{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:8px;padding:12px 14px;font-size:14.5px}
+.role h4{margin:0 0 4px;font:600 17px var(--display)}
+.role p{margin:0 0 6px}
+.role .k{font:12px var(--mono);color:var(--muted)}
+figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding-left:40px;margin-bottom:10px}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--water);color:var(--surface);font:600 13px/26px var(--mono);text-align:center}
+.refs li{font-size:14.5px}
+footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;max-height:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+  h1{font-size:32px}
+}
+@media print{ nav.toc,.navlink{display:none} .layout{display:block} body{background:#fff} }
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <div class="brand">
+    <img src="assets/fees-logo.png" alt="Faculty of Earth and Environmental Sciences logo" onerror="this.remove()">
+    <div class="brand-text"><strong>Faculty of Earth and Environmental Sciences</strong>University of Guyana</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="navlink" href="index.html">Open the game</a><a class="navlink" href="compare.html">Compare tables</a></div>
+</div></div>
+
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <p class="h">Contents</p>
+    <ol>
+      <li><a href="#overview">1. Overview</a></li>
+      <li><a href="#objectives">2. Learning objectives</a></li>
+      <li><a href="#theory">3. Principles and theory</a></li>
+      <li><a href="#system">4. The water system</a></li>
+      <li><a href="#roles">5. Stakeholder roles</a></li>
+      <li><a href="#rules">6. Rules of play</a></li>
+      <li><a href="#model">7. Model and equations</a></li>
+      <li><a href="#scoring">8. Scoring</a></li>
+      <li><a href="#climate">9. Climate and forecasts</a></li>
+      <li><a href="#parameters">10. Default parameters</a></li>
+      <li><a href="#examples">11. Worked examples</a></li>
+      <li><a href="#limits">12. Assumptions and limits</a></li>
+      <li><a href="#calibration">13. Real data and WEAP</a></li>
+      <li><a href="#facilitation">14. Facilitation and debrief</a></li>
+      <li><a href="#glossary">15. Glossary</a></li>
+      <li><a href="#references">16. References</a></li>
+    </ol>
+  </nav>
+
+<main>
+  <h1>Conservancy Council</h1>
+  <p class="lede">A role-play simulation of integrated water resources management (IWRM) for a coastal water conservancy in Guyana. This manual covers the rules, the theory behind the game, and every equation the model uses, for both water quantity and water quality.</p>
+  <div class="meta"><span>Version 2.0 · November 2026</span><span>Faculty of Earth and Environmental Sciences, University of Guyana</span><span>6 teams + 2 optional upstream teams · 8 seasons · about 2 hours</span></div>
+
+  <h2 id="overview"><span class="n">01</span>Overview</h2>
+  <p>Six stakeholder teams share one water body: a coastal conservancy that stores rainfall runoff from its catchment behind an earthen dam. The conservancy supplies Georgetown's drinking water and irrigation for rice and sugar. In wet seasons it threatens the dam, and the operator must release water through relief sluices into the Mahaica River, where downstream villages farm the floodplain.</p>
+  <p>Each round is one season. Teams read a rainfall outlook, negotiate, and set their decisions. The computer model then calculates the season's water balance: how much water came in, how much each user received, how much was released, whether the dam was overtopped, and who paid for it. Over eight seasons (two years) the teams live with the consequences of their own choices and of each other's.</p>
+  <p>Water quality runs alongside quantity. Coastal rice and sugar farms choose how much fertilizer to use; their runoff drains through canals and kokers to the estuary, where nitrogen threatens marine life. The conservancy's own water quality depends on what happens upstream in its catchment: farms add nitrogen, and gold mining and land clearing add sediment. The upstream basin lies outside the council's control. The facilitator can run it as a fixed scenario nobody at the table can influence, then hand it to two upstream teams to show what changes when both basins talk.</p>
+  <div class="callout">
+    <p><strong>Inspired by, not a model of, a real system.</strong> The setting is based on the kind of choices faced at coastal conservancies such as the East Demerara Water Conservancy. All default numbers are illustrative and chosen for teaching. Section 13 explains how to replace them with real data.</p>
+  </div>
+
+  <h2 id="objectives"><span class="n">02</span>Learning objectives</h2>
+  <p>After playing and debriefing, participants should be able to:</p>
+  <ol>
+    <li>Explain a water balance (inflows, losses, abstractions, releases, change in storage) and use one to reason about a shared resource.</li>
+    <li>Identify the competing demands on a multipurpose water body and the trade-offs between supply reliability, flood safety, livelihoods and ecosystems.</li>
+    <li>Describe how allocation rules (proportional sharing, priority to drinking water, priority to irrigation) shift the burden of shortage between users.</li>
+    <li>Recognise externalities: how one stakeholder's decision imposes costs on another (for example, flood releases onto downstream communities).</li>
+    <li>Assess the value and limits of seasonal forecasts and monitoring data in decision-making under uncertainty.</li>
+    <li>Reflect on the institutions IWRM calls for: stakeholder participation, transparent rules, compensation and basin-level coordination.</li>
+    <li>Explain how nonpoint-source pollution from farms and mining moves through a water system, and why the same pollution load is more harmful in a drought.</li>
+    <li>Recognise that a basin can be harmed by an upstream basin it cannot regulate, and argue for interagency and interbasin cooperation.</li>
+  </ol>
+
+  <h2 id="theory"><span class="n">03</span>Principles and theory</h2>
+  <h3>3.1 Integrated water resources management</h3>
+  <p>The Global Water Partnership defines IWRM as a process that promotes the coordinated development and management of water, land and related resources to maximise economic and social welfare equitably, without compromising the sustainability of vital ecosystems. The game puts each part of that definition into a role:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>IWRM idea</th><th>Where it appears in the game</th></tr></thead>
+    <tbody>
+      <tr><td>Water is finite and vulnerable (Dublin Principle 1)</td><td>A single storage that every user draws from; droughts drain it and floods threaten it.</td></tr>
+      <tr><td>Participatory approach involving users, planners and policy-makers (Principle 2)</td><td>Six teams with their own goals negotiate before each season and vote on the allocation rule.</td></tr>
+      <tr><td>Water has an economic value in all its competing uses (Principle 4)</td><td>Rice and sugar profits depend on water delivered; GWI scores on supply reliability; Mahaica loses money to flooding.</td></tr>
+      <tr><td>Equity</td><td>The allocation rule decides who absorbs shortages; releases decide who absorbs floods.</td></tr>
+      <tr><td>Environmental sustainability</td><td>The Environment team protects a minimum storage, and the wetland is scored on its health.</td></tr>
+      <tr><td>Coordination across sectors</td><td>Supply, irrigation, flood safety and ecology are managed from one storage, so no team can optimise alone.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3.2 Common-pool resources</h3>
+  <p>The conservancy is a common-pool resource: it is hard to exclude users, and water one team takes is water another cannot use. Hardin's "tragedy of the commons" predicts over-use when each user acts alone. Elinor Ostrom's work showed that communities often avoid that outcome through clear rules, monitoring, graduated sanctions and forums for resolving conflict. In the game, over-planting rice when the forecast looks good is the tragedy; the council's allocation rule and side agreements are the institutional response.</p>
+
+  <h3>3.3 Upstream–downstream externalities</h3>
+  <p>When the operator releases water to protect the dam, the benefit (dam safety for the coast and Georgetown) goes to many people and the cost (flooded farms) falls on a few downstream. This is a classic negative externality. The game makes it visible and lets teams experiment with responses: release limits, timing releases ahead of forecast rain, or compensation paid to Mahaica.</p>
+
+  <h3>3.4 Storage, risk and the dual hazard</h3>
+  <p>A conservancy must be kept low enough to absorb heavy rain and high enough to get through a dry season. These goals pull in opposite directions. The operator works inside a band between the wetland-health level and the safe operating limit. Holding water "just in case" raises flood risk; releasing early raises drought risk. That is the core tension of reservoir operation.</p>
+
+  <h3>3.5 Decisions under uncertainty</h3>
+  <p>Teams see a seasonal rainfall outlook (El Niño, Normal or La Niña) before deciding. By default it is right 70% of the time. Players must decide how much to trust it, which shows the value of good hydrometeorological monitoring and forecasting, and the cost of acting on a wrong forecast.</p>
+
+  <h3>3.6 Serious games and participatory modelling</h3>
+  <p>The game belongs to a family of role-play simulations used in water management, including the River Basin Game, Irrigania and the Wat-A-Game toolkit. These rest on experiential learning theory: people learn by acting, observing the result and reflecting on it. In companion modelling, stakeholders and a simple model learn together, and the model's rules are kept transparent so players can question them. For that reason every equation in the game is published here.</p>
+
+  <h3>3.7 Nonpoint-source pollution and eutrophication</h3>
+  <p>Fertilizer that crops do not take up is washed off fields by rain and drainage. Unlike a pipe from a factory, it comes from thousands of hectares at once, which makes it a nonpoint source: hard to measure, hard to regulate, and largest in wet seasons. Excess nitrogen and phosphorus in water feed algae. Algal blooms block light, and when the algae die and decay they use up dissolved oxygen, which can kill fish (eutrophication). Some blooms produce toxins that harm livestock drinking the water. The game tracks nitrogen as a single indicator of this process.</p>
+  <h3>3.8 Sediment and mining</h3>
+  <p>Gold mining and land clearing loosen soil that rivers carry as suspended sediment. Muddy water smothers fish habitat and riverbeds, cuts the light aquatic plants need, and costs water utilities more to treat. In Guyana, mining also raises concerns about mercury, which the game leaves out to stay simple but which belongs in the debrief.</p>
+  <h3>3.9 Dilution: why drought and pollution go together</h3>
+  <p>A concentration is a mass divided by a volume. If the same pollution load enters a conservancy that holds half as much water, the concentration doubles. Droughts therefore make water quality worse even if nobody pollutes more, and decisions that draw the conservancy down (heavy irrigation, large releases) also concentrate what is left. Quantity and quality cannot be managed separately.</p>
+  <h3>3.10 Upstream basins and interbasin governance</h3>
+  <p>Water does not respect administrative boundaries. A catchment's farms and mines may sit in a different region, under a different agency (agriculture, mining, forestry), or across a national border, while the costs land downstream. Downstream managers can do excellent work and still be harmed by decisions they have no authority over. The game's upstream switch makes this concrete. The IWRM response is coordination across agencies and basins: shared monitoring, joint planning, agreed standards, and sometimes payments for ecosystem services, in which downstream beneficiaries pay upstream land users to protect water.</p>
+
+  <h2 id="system"><span class="n">04</span>The water system</h2>
+  <figure>
+    <svg viewBox="0 0 760 360" role="img" aria-label="Schematic of the conservancy water system">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--water)"/></marker>
+      <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+      <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--bad)"/></marker></defs>
+      <rect x="20" y="130" width="140" height="80" rx="10" fill="var(--water-soft)" stroke="var(--water)"/>
+      <text x="90" y="165" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Catchment</text>
+      <text x="90" y="185" text-anchor="middle" font-size="12" fill="var(--muted)">rainfall → runoff</text>
+      <line x1="160" y1="170" x2="262" y2="170" stroke="var(--water)" stroke-width="3" marker-end="url(#ar)"/>
+      <text x="211" y="160" text-anchor="middle" font-size="12" fill="var(--water)">Inflow Q</text>
+      <rect x="265" y="110" width="200" height="120" rx="10" fill="var(--surface)" stroke="var(--water)" stroke-width="2"/>
+      <rect x="267" y="165" width="196" height="63" rx="8" fill="var(--water)" opacity=".25"/>
+      <line x1="267" y1="190" x2="463" y2="190" stroke="var(--t-env)" stroke-dasharray="5 4" stroke-width="1.5"/>
+      <text x="365" y="140" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Conservancy storage S</text>
+      <text x="365" y="210" text-anchor="middle" font-size="11.5" fill="var(--t-env)">protected floor (Environment)</text>
+      <line x1="330" y1="108" x2="330" y2="50" stroke="var(--muted)" stroke-width="2" marker-end="url(#arm)"/>
+      <text x="338" y="60" font-size="12" fill="var(--muted)">Evaporation E</text>
+      <line x1="430" y1="108" x2="430" y2="50" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arb)"/>
+      <text x="438" y="60" font-size="12" fill="var(--bad)">Overtopping O → coast</text>
+      <line x1="465" y1="140" x2="600" y2="95" stroke="var(--water)" stroke-width="2.5" marker-end="url(#ar)"/>
+      <line x1="465" y1="160" x2="600" y2="160" stroke="var(--water)" stroke-width="2.5" marker-end="url(#ar)"/>
+      <line x1="465" y1="180" x2="600" y2="225" stroke="var(--water)" stroke-width="2.5" marker-end="url(#ar)"/>
+      <text x="610" y="99" font-size="14" fill="var(--t-gwi)" font-weight="600">GWI · Georgetown</text>
+      <text x="610" y="164" font-size="14" fill="var(--t-rice)" font-weight="600">Rice farmers</text>
+      <text x="610" y="229" font-size="14" fill="var(--t-sugar)" font-weight="600">Sugar estate</text>
+      <text x="528" y="135" font-size="12" fill="var(--water)" text-anchor="middle">Deliveries D</text>
+      <line x1="365" y1="230" x2="365" y2="292" stroke="var(--water)" stroke-width="3" marker-end="url(#ar)"/>
+      <text x="374" y="265" font-size="12" fill="var(--t-op)" font-weight="600">Relief sluices: release R (Operator)</text>
+      <rect x="230" y="295" width="270" height="48" rx="10" fill="var(--surface)" stroke="var(--t-mahaica)"/>
+      <text x="365" y="316" text-anchor="middle" font-size="14" font-weight="600" fill="var(--t-mahaica)">Mahaica River &amp; communities</text>
+      <text x="365" y="333" text-anchor="middle" font-size="11.5" fill="var(--muted)">flooding if R exceeds the safe limit</text>
+    </svg>
+    <figcaption>Figure 1. The conservancy as a single storage. Water enters as catchment inflow and leaves as evaporation, deliveries to three users, releases to the Mahaica River, and uncontrolled overtopping of the dam.</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 760 300" role="img" aria-label="Pollution pathways">
+      <defs><marker id="pq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+      <rect x="10" y="20" width="200" height="96" rx="10" fill="var(--surface)" stroke="var(--t-upfarm)" stroke-width="2"/>
+      <text x="110" y="44" text-anchor="middle" font-size="14" font-weight="600" fill="var(--t-upfarm)">Upstream basin</text>
+      <text x="110" y="66" text-anchor="middle" font-size="12" fill="var(--ink)">Farms: nitrogen</text>
+      <text x="110" y="84" text-anchor="middle" font-size="12" fill="var(--ink)">Mines, cleared land: sediment</text>
+      <text x="110" y="104" text-anchor="middle" font-size="11" fill="var(--muted)">outside the council's control</text>
+      <line x1="210" y1="68" x2="290" y2="68" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#pq)"/>
+      <rect x="292" y="20" width="200" height="96" rx="10" fill="var(--water-soft)" stroke="var(--water)" stroke-width="2"/>
+      <text x="392" y="48" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">Conservancy</text>
+      <text x="392" y="70" text-anchor="middle" font-size="12" fill="var(--ink)">mixing, dilution,</text>
+      <text x="392" y="88" text-anchor="middle" font-size="12" fill="var(--ink)">settling and uptake</text>
+      <line x1="492" y1="50" x2="575" y2="50" stroke="var(--muted)" stroke-width="2" marker-end="url(#pq)"/>
+      <text x="580" y="54" font-size="12.5" fill="var(--t-gwi)" font-weight="600">GWI: treatment cost</text>
+      <line x1="392" y1="116" x2="392" y2="186" stroke="var(--muted)" stroke-width="2" marker-end="url(#pq)"/>
+      <text x="400" y="150" font-size="12" fill="var(--muted)">releases carry pollution</text>
+      <rect x="292" y="188" width="200" height="56" rx="10" fill="var(--surface)" stroke="var(--t-mahaica)" stroke-width="2"/>
+      <text x="392" y="212" text-anchor="middle" font-size="13" font-weight="600" fill="var(--t-mahaica)">Mahaica River</text>
+      <text x="392" y="230" text-anchor="middle" font-size="11.5" fill="var(--ink)">livestock drink it</text>
+      <rect x="10" y="188" width="200" height="56" rx="10" fill="var(--surface)" stroke="var(--t-rice)" stroke-width="2"/>
+      <text x="110" y="212" text-anchor="middle" font-size="13" font-weight="600" fill="var(--t-rice)">Coastal rice and sugar</text>
+      <text x="110" y="230" text-anchor="middle" font-size="11.5" fill="var(--ink)">fertilizer in drainage</text>
+      <path d="M110,244 C110,285 560,285 600,248" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#pq)"/>
+      <text x="230" y="282" font-size="11.5" fill="var(--muted)">canals and kokers to the sea</text>
+      <line x1="492" y1="216" x2="575" y2="216" stroke="var(--muted)" stroke-width="2" marker-end="url(#pq)"/>
+      <rect x="578" y="186" width="172" height="60" rx="10" fill="var(--surface)" stroke="var(--t-env)" stroke-width="2"/>
+      <text x="664" y="210" text-anchor="middle" font-size="13" font-weight="600" fill="var(--t-env)">Estuary and coast</text>
+      <text x="664" y="228" text-anchor="middle" font-size="11.5" fill="var(--ink)">algae, fish kills</text>
+    </svg>
+    <figcaption>Figure 2. Pollution pathways. Upstream pollution passes through the conservancy; coastal farm runoff bypasses it and drains straight to the estuary. Both reach the coast.</figcaption>
+  </figure>
+  <p>The model treats the conservancy as one well-mixed storage, measured in million cubic metres (Mm³). Five storage levels define its behaviour:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Level</th><th class="r">Default (Mm³)</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Dead storage, <i>S</i><sub>dead</sub></td><td class="r num">60</td><td>Water below the intakes and sluices. It cannot be delivered or released.</td></tr>
+      <tr><td>Wetland health, <i>S</i><sub>eco</sub></td><td class="r num">120</td><td>Below this, the conservancy's wetlands and fisheries are stressed.</td></tr>
+      <tr><td>Starting storage, <i>S</i><sub>0</sub></td><td class="r num">200</td><td>Storage at the beginning of season 1.</td></tr>
+      <tr><td>Safe operating limit, <i>S</i><sub>safe</sub></td><td class="r num">300</td><td>Above this, the dam is under strain and the operator is penalised.</td></tr>
+      <tr><td>Dam crest, <i>S</i><sub>max</sub></td><td class="r num">340</td><td>Water above this overtops the dam: a breach and coastal flood.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="roles"><span class="n">05</span>Stakeholder roles</h2>
+  <p>Each team controls one decision per season and is scored on its own interests. Team scores are on different scales, so the scoreboard compares progress, not worth.</p>
+  <div class="roles">
+    <div class="role" style="--c:var(--t-gwi)"><h4>GWI</h4><p>Supplies Georgetown's drinking water from the conservancy.</p><p><b>Decides:</b> abstraction request, 0–30 Mm³; whether to invest in leak repair.</p><p><b>Wants:</b> its full need met every season.</p><p class="k">Need 15 Mm³/season · repair −15 pts, −2 Mm³ need</p></div>
+    <div class="role" style="--c:var(--t-rice)"><h4>Rice farmers</h4><p>Irrigate coastal rice lands; the largest water user.</p><p><b>Decides:</b> area planted, 0–25 thousand ha, and fertilizer rate (low, medium, high).</p><p><b>Wants:</b> profit, which needs area, water and fertilizer. High fertilizer pays more but sends more nitrogen to the coast.</p><p class="k">4 Mm³ per k ha per dry season</p></div>
+    <div class="role" style="--c:var(--t-sugar)"><h4>Sugar estate</h4><p>Irrigates cane fields; less thirsty per hectare than rice.</p><p><b>Decides:</b> cane area irrigated, 0–15 thousand ha, and fertilizer rate.</p><p><b>Wants:</b> profit.</p><p class="k">2.5 Mm³ per k ha per dry season</p></div>
+    <div class="role" style="--c:var(--t-op)"><h4>Conservancy operator</h4><p>Responsible for dam safety and for keeping users supplied.</p><p><b>Decides:</b> release through the relief sluices, 0–150 Mm³.</p><p><b>Wants:</b> storage inside the safe band, no breach, users supplied.</p><p class="k">Sluice capacity 150 Mm³/season</p></div>
+    <div class="role" style="--c:var(--t-mahaica)"><h4>Mahaica communities</h4><p>Villages and farms on the floodplain downstream of the sluices.</p><p><b>Decides:</b> how much farming and livestock to keep on the floodplain, 0–100%.</p><p><b>Wants:</b> income without flood losses or livestock harmed by polluted releases.</p><p class="k">River safe limit 60 Mm³/season</p></div>
+    <div class="role" style="--c:var(--t-env)"><h4>Environment (EPA)</h4><p>Represents the wetlands, water quality and coastal ecosystems.</p><p><b>Decides:</b> protected minimum storage, 60–200 Mm³, and a rule for coastal farms: none, buffer strips, or a fertilizer cap.</p><p><b>Wants:</b> a healthy wetland, clean conservancy water and a healthy estuary. Has no authority upstream.</p><p class="k">Healthy above 120 Mm³</p></div>
+    <div class="role" style="--c:var(--t-upfarm)"><h4>Upstream farmers <span style="font-weight:400;font-size:13px">(optional)</span></h4><p>Farms in the conservancy's catchment, in another jurisdiction.</p><p><b>Decides:</b> farmland, 0–12 thousand ha, and fertilizer rate.</p><p><b>Wants:</b> profit. Feels none of the downstream effects.</p><p class="k">60 / 120 / 200 kg N/ha by rate</p></div>
+    <div class="role" style="--c:var(--t-upmine)"><h4>Upstream miners <span style="font-weight:400;font-size:13px">(optional)</span></h4><p>Gold mining in the catchment.</p><p><b>Decides:</b> mining scale (none to large) and whether to use settling ponds.</p><p><b>Wants:</b> earnings. Ponds cut sediment by 70% but cost money.</p><p class="k">Earns 25 / 50 / 80 pts by scale</p></div>
+  </div>
+  <p>The whole group also acts as the <strong>Basin Council</strong>. Before each season it chooses the allocation rule that applies if demand exceeds the water available.</p>
+
+  <h2 id="rules"><span class="n">06</span>Rules of play</h2>
+  <h3>6.1 Setup</h3>
+  <ul>
+    <li>Split participants into six teams (2–5 people each). Hand each team its role card from section 5.</li>
+    <li>Project the game. One facilitator enters every decision on the shared screen.</li>
+    <li>Check that Settings show the climate script and parameters you want. Restarting with the same seed reproduces the same weather.</li>
+  </ul>
+  <h3>6.2 Each season</h3>
+  <ol class="steps">
+    <li><strong>Outlook.</strong> The facilitator reads out the season, its typical inflow and evaporation, and the rainfall outlook.</li>
+    <li><strong>Negotiation (5–8 minutes).</strong> Teams talk freely. They may make promises, threats, deals and side payments, but promises are not enforced by the model.</li>
+    <li><strong>Council vote.</strong> The council picks the allocation rule for this season by majority (or another procedure the group agrees).</li>
+    <li><strong>Decisions.</strong> Each team gives its decision to the facilitator, who sets the sliders. Decisions are final once the season runs.</li>
+    <li><strong>Run.</strong> The facilitator clicks <em>Run this season</em>. The actual climate is revealed.</li>
+    <li><strong>Report (3–5 minutes).</strong> Read out the water balance, the outcomes table and the event log. Each team states what it gained or lost.</li>
+  </ol>
+  <h3>6.3 Other rules</h3>
+  <ul>
+    <li>Decisions carry over to the next season unless a team changes them. Leak repair must be chosen again each season it is wanted.</li>
+    <li><em>Undo last season</em> exists to fix data-entry mistakes, not to replay bad luck.</li>
+    <li>Optional compensation rule: teams may agree to transfer points (for example, GWI pays Mahaica for accepting a release). The facilitator records transfers by hand and adjusts final scores.</li>
+    <li>The game ends after the last season (default 8). The basin total and each team's score feed into the debrief. There is no single winner; ask whether the basin as a whole did well.</li>
+  </ul>
+
+  <h3>6.4 Running the upstream basin</h3>
+  <p>The facilitator sets the upstream basin each season with the <em>Upstream is</em> selector:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Setting</th><th class="r">Farmland</th><th>Fertilizer</th><th>Mining</th><th>Use it to</th></tr></thead>
+    <tbody>
+      <tr><td>Fixed: pristine forest</td><td class="r num">0</td><td>—</td><td>None</td><td>Show a clean baseline.</td></tr>
+      <tr><td>Fixed: current practice</td><td class="r num">4k ha</td><td>Medium</td><td>Small-scale</td><td>The default. Quality is fine unless the conservancy runs low.</td></tr>
+      <tr><td>Fixed: farming and mining expansion</td><td class="r num">9k ha</td><td>High</td><td>Large-scale</td><td>Show downstream teams being harmed by decisions they cannot influence.</td></tr>
+      <tr><td>Played by two upstream teams</td><td colspan="3">Upstream farmers and miners decide each season</td><td>Open interbasin negotiation.</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Suggested sequence:</strong> seasons 1–4 on <em>current practice</em>; switch to <em>expansion</em> for seasons 5–6 without telling the downstream teams why their water is getting worse; then seat two upstream teams for seasons 7–8 and allow negotiation across the basin boundary, including side payments. Alternatively, run the whole game twice with the same seed, once downstream-only and once with upstream teams, and compare the charts.</p>
+  <p>Upstream teams are scored on their own earnings only. They feel none of the downstream harm, which is the point: any change in their behaviour has to come from negotiation, payment or regulation by a body with authority over both basins.</p>
+
+  <h2 id="model"><span class="n">07</span>Model and equations</h2>
+  <p>The model is a lumped, single-reservoir water balance with a seasonal time step. All quantities are in Mm³ per season. The calculations run in this order each season <i>t</i>.</p>
+
+  <h3>7.1 Inflow</h3>
+  <div class="eq"><div class="f"><i>Q<sub>t</sub></i> = <i>Q̄<sub>s</sub></i> × <i>c<sub>Q</sub></i>(<i>k<sub>t</sub></i>) × (1 + <i>ε<sub>t</sub></i>)</div><div class="tag">(1)</div></div>
+  <p class="where">where <b>Q̄<sub>s</sub></b> is the base inflow for season type <i>s</i> (long dry, long wet, short dry, short wet), <b>k<sub>t</sub></b> is the actual climate state, <b>c<sub>Q</sub></b> is 0.4 for El Niño, 1.0 for Normal and 1.7 for La Niña, and <b>ε<sub>t</sub></b> is random noise drawn uniformly from [−0.15, +0.15].</p>
+
+  <h3>7.2 Evaporation</h3>
+  <div class="eq"><div class="f"><i>E<sub>t</sub></i> = <i>Ē<sub>s</sub></i> × <i>c<sub>E</sub></i>(<i>k<sub>t</sub></i>)</div><div class="tag">(2)</div></div>
+  <p class="where">where <b>Ē<sub>s</sub></b> is the base evaporation for the season and <b>c<sub>E</sub></b> is 1.2 in El Niño seasons and 1.0 otherwise. Evaporation does not depend on storage, a simplification noted in section 12.</p>
+
+  <h3>7.3 Protected floor and available water</h3>
+  <div class="eq"><div class="f"><i>F<sub>t</sub></i> = max(<i>S</i><sub>dead</sub>, <i>S</i><sub>env,t</sub>)</div><div class="tag">(3)</div></div>
+  <div class="eq"><div class="f"><i>A<sub>t</sub></i> = max(0, <i>S<sub>t</sub></i> + <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i> − <i>F<sub>t</sub></i>)</div><div class="tag">(4)</div></div>
+  <p class="where">where <b>S<sub>t</sub></b> is storage at the start of the season, <b>S<sub>env,t</sub></b> is the Environment team's protected minimum storage, and <b>A<sub>t</sub></b> is the water that can be given to users without going below the floor.</p>
+
+  <h3>7.4 Demands</h3>
+  <div class="eq"><div class="f"><i>d</i><sub>GWI</sub> = request<sub>GWI</sub> &nbsp;&nbsp; <i>d</i><sub>rice</sub> = <i>a</i><sub>rice</sub> × <i>w</i><sub>rice</sub> × <i>φ<sub>s</sub></i> &nbsp;&nbsp; <i>d</i><sub>sugar</sub> = <i>a</i><sub>sugar</sub> × <i>w</i><sub>sugar</sub> × <i>φ<sub>s</sub></i></div><div class="tag">(5)</div></div>
+  <p class="where">where <b>a</b> is area in thousand hectares, <b>w</b> is the water requirement per thousand hectares in a fully dry season (rice 4.0, sugar 2.5 Mm³), and <b>φ<sub>s</sub></b> is the crop water factor: 1.0 in dry seasons, 0.5 in the long wet season and 0.6 in the short wet season, because rain supplies part of the crops' needs.</p>
+  <p>GWI's real <em>need</em> is separate from its <em>request</em>:</p>
+  <div class="eq"><div class="f"><i>n</i><sub>GWI,t</sub> = max(0, <i>n</i><sub>GWI</sub> − Δ<i>n</i> × <i>L<sub>t</sub></i>)</div><div class="tag">(6)</div></div>
+  <p class="where">where <b>n</b><sub>GWI</sub> = 15 Mm³ is the base need, <b>Δn</b> = 2 Mm³ is the saving per leak repair, and <b>L<sub>t</sub></b> is the number of repairs made in earlier seasons. A repair takes effect from the following season.</p>
+
+  <h3>7.5 Allocation</h3>
+  <p>If total demand <i>Σd</i> ≤ <i>A<sub>t</sub></i>, every user receives its demand in full. Otherwise the council's rule shares out <i>A<sub>t</sub></i>:</p>
+  <div class="eq"><div class="f"><b>Proportional:</b> &nbsp; <i>D<sub>i</sub></i> = <i>d<sub>i</sub></i> × <i>A<sub>t</sub></i> / <i>Σd</i></div><div class="tag">(7a)</div></div>
+  <div class="eq"><div class="f"><b>Drinking water first:</b> &nbsp; <i>D</i><sub>GWI</sub> = min(<i>d</i><sub>GWI</sub>, <i>A<sub>t</sub></i>); the remainder <i>A<sub>t</sub></i> − <i>D</i><sub>GWI</sub> is shared proportionally between rice and sugar</div><div class="tag">(7b)</div></div>
+  <div class="eq"><div class="f"><b>Irrigation first:</b> &nbsp; rice and sugar share <i>A<sub>t</sub></i> proportionally up to their demand; GWI receives what remains</div><div class="tag">(7c)</div></div>
+  <p>Total delivered water is <i>D<sub>t</sub></i> = <i>D</i><sub>GWI</sub> + <i>D</i><sub>rice</sub> + <i>D</i><sub>sugar</sub>, and the deficit is <i>Σd</i> − <i>D<sub>t</sub></i>.</p>
+
+  <h3>7.6 Release</h3>
+  <p>Deliveries come first; the operator's release is then limited by the sluice capacity and by the water left above dead storage:</p>
+  <div class="eq"><div class="f"><i>R<sub>t</sub></i> = min( <i>r<sub>t</sub></i>, <i>R</i><sub>cap</sub>, max(0, <i>S<sub>t</sub></i> + <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i> − <i>D<sub>t</sub></i> − <i>S</i><sub>dead</sub>) )</div><div class="tag">(8)</div></div>
+  <p class="where">where <b>r<sub>t</sub></b> is the operator's requested release and <b>R</b><sub>cap</sub> = 150 Mm³ is the sluice capacity. The release may take storage below the Environment floor: the floor binds deliveries only, which is a deliberate source of tension.</p>
+
+  <h3>7.7 Storage update and overtopping</h3>
+  <div class="eq"><div class="f"><i>S</i>′ = <i>S<sub>t</sub></i> + <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i> − <i>D<sub>t</sub></i> − <i>R<sub>t</sub></i></div><div class="tag">(9)</div></div>
+  <div class="eq"><div class="f"><i>O<sub>t</sub></i> = max(0, <i>S</i>′ − <i>S</i><sub>max</sub>) &nbsp;&nbsp;&nbsp; <i>S</i><sub><i>t</i>+1</sub> = <i>S</i>′ − <i>O<sub>t</sub></i></div><div class="tag">(10)</div></div>
+  <p>Any overtopping <i>O<sub>t</sub></i> &gt; 0 is a <strong>breach</strong>: uncontrolled water floods the coast. Combining (9) and (10), the full balance for each season is:</p>
+  <div class="eq"><div class="f">Δ<i>S</i> = <i>S</i><sub><i>t</i>+1</sub> − <i>S<sub>t</sub></i> = <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i> − <i>D<sub>t</sub></i> − <i>R<sub>t</sub></i> − <i>O<sub>t</sub></i></div><div class="tag">(11)</div></div>
+  <p>This is the "Water balance" table shown after each season. It always closes: start + inflow − evaporation − delivered − released − overtopped = end.</p>
+
+  <h3>7.8 Upstream land use and inflow</h3>
+  <p>Clearing land for farms and mines makes runoff faster: more water arrives in wet seasons and less in dry seasons. Equation (1) is multiplied by:</p>
+  <div class="eq"><div class="f"><i>m<sub>t</sub></i> = 1 + 0.01 <i>a</i><sub>up</sub> + 0.03 <i>g</i> &nbsp;(wet seasons) &nbsp;&nbsp;&nbsp; <i>m<sub>t</sub></i> = max(0.5, 1 − 0.008 <i>a</i><sub>up</sub> − 0.015 <i>g</i>) &nbsp;(dry seasons)</div><div class="tag">(12)</div></div>
+  <p class="where">where <b>a</b><sub>up</sub> is upstream farmland in thousand ha and <b>g</b> is the mining scale (0 none, 1 small, 2 medium, 3 large).</p>
+
+  <h3>7.9 Pollution loads into the conservancy</h3>
+  <p>Loads are in tonnes per season. Because 1 tonne per Mm³ equals 1 mg/L, masses and volumes combine directly into concentrations.</p>
+  <div class="eq"><div class="f"><i>L</i><sub>N</sub> = <i>c</i><sub>N,bg</sub> <i>Q<sub>t</sub></i> + <i>a</i><sub>up</sub> × <i>N</i><sub>up</sub>(rate) × <i>x<sub>s</sub></i></div><div class="tag">(13)</div></div>
+  <p class="where">where <b>c</b><sub>N,bg</sub> = 0.4 mg/L is the natural nitrogen in catchment runoff, <b>N</b><sub>up</sub> is fertilizer applied (60, 120 or 200 kg N/ha; thousand ha × kg/ha = tonnes), and <b>x<sub>s</sub></b> is the share washed off: 0.25 in wet seasons, 0.08 in dry seasons.</p>
+  <div class="eq"><div class="f"><i>L</i><sub>TSS</sub> = <i>c</i><sub>T,bg</sub> <i>Q<sub>t</sub></i> + 300 <i>a</i><sub>up</sub> <i>w<sub>s</sub></i> + <i>G</i>(<i>g</i>) × <i>h<sub>s</sub></i> × (1 − 0.7 [ponds])</div><div class="tag">(14)</div></div>
+  <p class="where">where <b>c</b><sub>T,bg</sub> = 8 mg/L is natural sediment, 300 t per thousand ha is erosion from cleared farmland (<b>w<sub>s</sub></b> = 1 wet, 0.3 dry), <b>G</b> is mining sediment (0, 5,000, 14,000 or 30,000 t by scale), and <b>h<sub>s</sub></b> = 1.5 in wet seasons and 0.5 in dry seasons. Settling ponds remove 70%.</p>
+
+  <h3>7.10 Mixing, removal and concentration</h3>
+  <p>The conservancy is treated as well mixed. The pollutant mass already in it and the new load are combined, a fixed share is removed (nitrogen by plant uptake and denitrification, sediment by settling), and the remainder is spread through the water present before withdrawals:</p>
+  <div class="eq"><div class="f"><i>C</i><sub>N,<i>t</i></sub> = (<i>M</i><sub>N,<i>t</i></sub> + <i>L</i><sub>N</sub>)(1 − <i>k</i><sub>N</sub>) / (<i>S<sub>t</sub></i> + <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i>) &nbsp;&nbsp;&nbsp; <i>C</i><sub>T,<i>t</i></sub> = (<i>M</i><sub>T,<i>t</i></sub> + <i>L</i><sub>TSS</sub>)(1 − <i>k</i><sub>T</sub>) / (<i>S<sub>t</sub></i> + <i>Q<sub>t</sub></i> − <i>E<sub>t</sub></i>)</div><div class="tag">(15)</div></div>
+  <p class="where">where <b>M</b> is the pollutant mass in the conservancy at the start of the season, <b>k</b><sub>N</sub> = 0.3 and <b>k</b><sub>T</sub> = 0.6. Evaporation removes water but not pollutant, so it concentrates what remains.</p>
+  <p>Every outflow (deliveries, releases, overtopping) leaves at this concentration, so the mass carried into the next season is:</p>
+  <div class="eq"><div class="f"><i>M</i><sub><i>t</i>+1</sub> = <i>C<sub>t</sub></i> × <i>S</i><sub><i>t</i>+1</sub></div><div class="tag">(16)</div></div>
+
+  <h3>7.11 Nitrogen reaching the estuary</h3>
+  <p>Coastal farm drainage bypasses the conservancy and goes to the sea. Released and overtopped conservancy water also reaches the coast through the Mahaica River:</p>
+  <div class="eq"><div class="f"><i>N</i><sub>coast</sub> = (<i>a</i><sub>rice</sub> <i>N</i><sub>rice</sub> + <i>a</i><sub>sugar</sub> <i>N</i><sub>sugar</sub>) × <i>x<sub>s</sub></i> × (1 − 0.3 [buffer]) + (<i>R<sub>t</sub></i> + <i>O<sub>t</sub></i>) × <i>C</i><sub>N,<i>t</i></sub></div><div class="tag">(17)</div></div>
+  <p class="where">where <b>N</b><sub>rice</sub> is 40, 80 or 120 and <b>N</b><sub>sugar</sub> is 30, 60 or 90 kg N/ha by fertilizer rate. Buffer strips cut farm runoff by 30%. Under the EPA fertilizer cap, a "high" choice is applied as "medium".</p>
+
+  <h3>7.12 Quality status</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Indicator</th><th class="r">Good</th><th class="r">Caution</th><th class="r">Poor</th></tr></thead>
+    <tbody>
+      <tr><td>Conservancy nitrogen, mg/L</td><td class="r num">≤ 1.0</td><td class="r num">1.0–2.0</td><td class="r num">&gt; 2.0</td></tr>
+      <tr><td>Conservancy suspended sediment, mg/L</td><td class="r num">≤ 25</td><td class="r num">25–60</td><td class="r num">&gt; 60</td></tr>
+      <tr><td>Nitrogen reaching the estuary, t/season</td><td class="r num">≤ 450</td><td class="r num">450–650</td><td class="r num">≥ 650</td></tr>
+    </tbody>
+  </table></div>
+  <p>Conservancy water is "poor" if either indicator is poor, "caution" if either is in caution. These thresholds are teaching values chosen to make the game's dynamics visible, not regulatory standards.</p>
+
+  <h2 id="scoring"><span class="n">08</span>Scoring</h2>
+  <p>Points are earned each season and summed over the game. Let <i>f<sub>i</sub></i> = <i>D<sub>i</sub></i>/<i>d<sub>i</sub></i> be the fraction of demand met (1 if demand is zero).</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Team</th><th>Points per season</th><th>Default constants</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot" style="--c:var(--t-gwi)"></span>GWI</td><td class="num">30 × min(1, D<sub>GWI</sub>/n<sub>GWI,t</sub>) − 15 × [repair] − T<sub>t</sub></td><td>Treatment cost T = min(20, 0.25 × (C<sub>T</sub> − 25)<sup>+</sup> + 8 × (C<sub>N</sub> − 1.0)<sup>+</sup>)</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-rice)"></span>Rice farmers</td><td class="num">a<sub>rice</sub> × (p<sub>rice</sub> × y × f<sub>rice</sub> − c<sub>rice</sub> − c<sub>fert</sub> − c<sub>buffer</sub>)</td><td>p = 10, c = 4 per k ha; yield y = 0.85 / 1.0 / 1.15 and c<sub>fert</sub> = −0.5 / 0 / +0.8 for low / medium / high; buffer strips cost 0.3</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-sugar)"></span>Sugar estate</td><td class="num">a<sub>sugar</sub> × (p<sub>sugar</sub> × y × f<sub>sugar</sub> − c<sub>sugar</sub> − c<sub>fert</sub> − c<sub>buffer</sub>)</td><td>p = 8, c = 3 per k ha; same fertilizer terms</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-op)"></span>Operator</td><td class="num">+20 if S<sub>t+1</sub> ≤ S<sub>safe</sub>; −30 if above S<sub>safe</sub>; −100 if breach; plus 10 if D<sub>t</sub>/Σd ≥ 0.9</td><td>S<sub>safe</sub> = 300</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-mahaica)"></span>Mahaica communities</td><td class="num">I × α − δ × max(0, R<sub>t</sub> − R<sub>safe</sub>) × α − 15 × α × [polluted release]</td><td>I = 40, δ = 1.2, R<sub>safe</sub> = 60; a release is polluted if R &gt; 0 and either conservancy indicator is poor</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-env)"></span>Environment</td><td class="num">±25 for the wetland (S<sub>t+1</sub> ≥ S<sub>eco</sub>) + 10 / 0 / −15 for conservancy water good / caution / poor + 10 / 0 / −20 for the estuary good / caution / poor</td><td>S<sub>eco</sub> = 120</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-upfarm)"></span>Upstream farmers</td><td class="num">a<sub>up</sub> × (8 × y − 3 − c<sub>fert</sub>)</td><td>Rain-fed, no downstream penalties</td></tr>
+      <tr><td><span class="dot" style="--c:var(--t-upmine)"></span>Upstream miners</td><td class="num">25 / 50 / 80 by scale − 12 × [ponds]</td><td>No downstream penalties</td></tr>
+    </tbody>
+  </table></div>
+  <p class="where">where <b>α</b> is Mahaica's floodplain activity as a fraction (0–1). <strong>Breach penalty:</strong> in any season with overtopping, every team except the operator loses a further 50 points. The operator's −100 already reflects it.</p>
+  <h3>Why the scores are built this way</h3>
+  <ul>
+    <li><strong>Rice and sugar</strong> pay their costs on every hectare planted but earn revenue only on the share that is watered. Over-planting in a drought therefore loses money, which rewards realistic planting.</li>
+    <li><strong>GWI</strong> is scored against its need, not its request. Asking for more than it needs takes water from others without earning GWI anything.</li>
+    <li><strong>Mahaica's</strong> damage grows with both the excess release and how much it has put on the floodplain, so the community shares responsibility for its exposure.</li>
+    <li><strong>The operator</strong> is rewarded for safety and for supply together, so neither "drain it" nor "fill it" is a winning strategy.</li>
+    <li><strong>Fertilizer</strong> is privately profitable: high fertilizer earns rice farmers about 0.7 more points per thousand ha than medium when water is plentiful. The cost lands on the estuary, through the Environment team's score. That is an externality the players have to resolve.</li>
+    <li><strong>Upstream teams</strong> feel no downstream harm, so the game rewards them for polluting unless the downstream teams negotiate or pay.</li>
+    <li>The <strong>basin totals</strong> (downstream and upstream, shown separately) are rough measures of collective welfare. Debate whether they are fair.</li>
+  </ul>
+
+  <h2 id="climate"><span class="n">09</span>Climate and forecasts</h2>
+  <p>Seasons follow Guyana's coastal bimodal rainfall pattern and repeat in this order:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Crop factor φ</th></tr></thead>
+    <tbody>
+      <tr><td>Long dry</td><td>Feb–Apr</td><td class="r num">40</td><td class="r num">35</td><td class="r num">1.0</td></tr>
+      <tr><td>Long wet</td><td>May–Aug</td><td class="r num">220</td><td class="r num">25</td><td class="r num">0.5</td></tr>
+      <tr><td>Short dry</td><td>Sep–Nov</td><td class="r num">35</td><td class="r num">40</td><td class="r num">1.0</td></tr>
+      <tr><td>Short wet</td><td>Dec–Jan</td><td class="r num">120</td><td class="r num">15</td><td class="r num">0.6</td></tr>
+    </tbody>
+  </table></div>
+  <p>The default climate script for the eight seasons is: Normal, <strong>La Niña</strong>, Normal, Normal, <strong>El Niño</strong>, Normal, <strong>El Niño</strong>, <strong>La Niña</strong>. The early La Niña long-wet season tests flood management; the later El Niño dry seasons test drought management. In <em>random</em> mode each season is El Niño with probability 0.25, Normal 0.5 and La Niña 0.25.</p>
+  <p><strong>Forecast:</strong> with probability <i>p</i> (default 0.7) the outlook equals the actual climate; otherwise it shows one of the other two states at random. Weather is generated from a fixed random seed, so two groups playing with the same seed face identical weather and forecasts, which makes groups comparable.</p>
+
+  <h2 id="parameters"><span class="n">10</span>Default parameters</h2>
+  <p>Every value below can be changed under Settings in the game. Changing settings restarts the game.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Parameter</th><th class="r">Default</th><th>Units</th><th>Used in</th></tr></thead>
+    <tbody>
+      <tr><td>Seasons in the game</td><td class="r num">8</td><td>seasons</td><td>Game length</td></tr>
+      <tr><td>Random seed</td><td class="r num">2026</td><td>—</td><td>Noise and forecasts</td></tr>
+      <tr><td>Forecast accuracy, <i>p</i></td><td class="r num">0.7</td><td>probability</td><td>Section 9</td></tr>
+      <tr><td>Inflow noise, ±ε</td><td class="r num">0.15</td><td>fraction</td><td>Eq. 1</td></tr>
+      <tr><td>Starting storage, S<sub>0</sub></td><td class="r num">200</td><td>Mm³</td><td>Eq. 4</td></tr>
+      <tr><td>Dead storage</td><td class="r num">60</td><td>Mm³</td><td>Eqs. 3, 8</td></tr>
+      <tr><td>Wetland health level</td><td class="r num">120</td><td>Mm³</td><td>Environment score</td></tr>
+      <tr><td>Safe operating limit</td><td class="r num">300</td><td>Mm³</td><td>Operator score</td></tr>
+      <tr><td>Dam crest (overtops)</td><td class="r num">340</td><td>Mm³</td><td>Eq. 10</td></tr>
+      <tr><td>Sluice capacity</td><td class="r num">150</td><td>Mm³/season</td><td>Eq. 8</td></tr>
+      <tr><td>Mahaica safe release</td><td class="r num">60</td><td>Mm³/season</td><td>Mahaica score</td></tr>
+      <tr><td>GWI base need</td><td class="r num">15</td><td>Mm³/season</td><td>Eq. 6</td></tr>
+      <tr><td>Leak repair saving / cost</td><td class="r num">2 / 15</td><td>Mm³ / points</td><td>Eq. 6, GWI score</td></tr>
+      <tr><td>Rice water use / revenue / cost</td><td class="r num">4.0 / 10 / 4</td><td>per k ha</td><td>Eq. 5, Rice score</td></tr>
+      <tr><td>Sugar water use / revenue / cost</td><td class="r num">2.5 / 8 / 3</td><td>per k ha</td><td>Eq. 5, Sugar score</td></tr>
+      <tr><td>Mahaica income at 100%</td><td class="r num">40</td><td>points</td><td>Mahaica score</td></tr>
+      <tr><td>Flood damage per Mm³ excess</td><td class="r num">1.2</td><td>points/Mm³</td><td>Mahaica score</td></tr>
+      <tr><td>Climate inflow factors</td><td class="r num">0.4 / 1.0 / 1.7</td><td>El Niño / Normal / La Niña</td><td>Eq. 1 (fixed in code)</td></tr>
+      <tr><td>El Niño evaporation factor</td><td class="r num">1.2</td><td>—</td><td>Eq. 2 (fixed in code)</td></tr>
+      <tr><td>Starting nitrogen / sediment</td><td class="r num">0.6 / 10</td><td>mg/L</td><td>Initial M</td></tr>
+      <tr><td>Natural nitrogen / sediment in inflow</td><td class="r num">0.4 / 8</td><td>mg/L</td><td>Eqs. 13, 14</td></tr>
+      <tr><td>Removal per season, nitrogen / sediment</td><td class="r num">0.3 / 0.6</td><td>fraction</td><td>Eq. 15</td></tr>
+      <tr><td>Nitrogen washed off, wet / dry</td><td class="r num">0.25 / 0.08</td><td>fraction</td><td>Eqs. 13, 17</td></tr>
+      <tr><td>Coastal fertilizer, rice / sugar</td><td class="r num">40–80–120 / 30–60–90</td><td>kg N/ha</td><td>Eq. 17</td></tr>
+      <tr><td>Upstream fertilizer</td><td class="r num">60–120–200</td><td>kg N/ha</td><td>Eq. 13</td></tr>
+      <tr><td>Mining sediment by scale</td><td class="r num">0–5,000–14,000–30,000</td><td>t/season</td><td>Eq. 14</td></tr>
+      <tr><td>Settling pond removal / cost</td><td class="r num">0.7 / 12</td><td>fraction / points</td><td>Eq. 14, miners' score</td></tr>
+      <tr><td>Buffer strip N cut / cost</td><td class="r num">0.3 / 0.3</td><td>fraction / points per k ha</td><td>Eq. 17, farm scores</td></tr>
+      <tr><td>Quality thresholds</td><td class="r num">see 7.12</td><td>mg/L, t</td><td>Status and scores</td></tr>
+      <tr><td>Livestock loss at 100% activity</td><td class="r num">15</td><td>points</td><td>Mahaica score</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="examples"><span class="n">11</span>Worked examples</h2>
+  <p>All three examples use the default settings and the starting decisions: GWI requests 15, rice 15k ha, sugar 8k ha, Environment reserve 90, Mahaica activity 60%.</p>
+  <h3>11.1 Season 1: a normal long dry season</h3>
+  <p>Start storage 200. The seeded noise is −5.7%, so inflow is 40 × 1.0 × 0.943 = <span class="num">37.7</span>; evaporation is <span class="num">35</span>. The floor is max(60, 90) = 90, so available water is 200 + 37.7 − 35 − 90 = <span class="num">112.7</span>.</p>
+  <p>Demands: GWI 15, rice 15 × 4.0 × 1.0 = 60, sugar 8 × 2.5 × 1.0 = 20; total 95. That is less than 112.7, so every user is fully supplied. With a release of 20, end storage is 200 + 37.7 − 35 − 95 − 20 = <strong class="num">87.7</strong>.</p>
+  <p>Scores: GWI 30; rice 15 × (10 − 4) = 90; sugar 8 × (8 − 3) = 40; operator 20 + 10 = 30; Mahaica 40 × 0.6 = 24; Environment −25, because 87.7 is below the wetland level of 120. <em>Lesson: full supply in a dry season can leave the ecosystem, and the next season, short.</em></p>
+
+  <h3>11.2 Season 2: La Niña and the operator's dilemma</h3>
+  <p>Start storage 87.7. La Niña inflow is 220 × 1.7 × 1.036 = <span class="num">387.3</span>. Demands are smaller in the wet season (rice 30, sugar 10, GWI 15). The operator's choice decides who pays:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Operator release</th><th class="r">End storage</th><th>Dam</th><th class="r">Mahaica damage</th><th class="r">Operator pts</th><th class="r">Mahaica pts</th></tr></thead>
+    <tbody>
+      <tr><td>20 Mm³ (cautious with the river)</td><td class="r num">340</td><td style="color:var(--bad)">Overtops by 35: breach</td><td class="r num">0</td><td class="r num">−90</td><td class="r num">−26</td></tr>
+      <tr><td>85 Mm³ (compromise)</td><td class="r num">310</td><td style="color:var(--warn)">Above the safe limit</td><td class="r num">18</td><td class="r num">−20</td><td class="r num">6</td></tr>
+      <tr><td>150 Mm³ (full sluices)</td><td class="r num">245</td><td style="color:var(--good)">Safe</td><td class="r num">64.8</td><td class="r num">30</td><td class="r num">−40.8</td></tr>
+    </tbody>
+  </table></div>
+  <p><em>Lesson: there is no option without a loser. A breach hurts everyone (all other teams lose 50); a full release protects the coast at Mahaica's expense. This is where compensation, early releases before the rain, or Mahaica reducing its floodplain exposure become worth negotiating.</em></p>
+
+  <h3>11.3 Season 7: El Niño drought and the allocation rule</h3>
+  <p>Suppose storage is 160 at the start of the El Niño short dry season (release set to 0). Inflow is 35 × 0.4 × 0.884 = <span class="num">12.4</span>; evaporation is 40 × 1.2 = <span class="num">48</span>. Available above the floor of 90: 160 + 12.4 − 48 − 90 = <strong class="num">34.4</strong> against demand of 95.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Council rule</th><th class="r">GWI gets</th><th class="r">Rice gets</th><th class="r">Sugar gets</th><th class="r">GWI pts</th><th class="r">Rice pts</th><th class="r">Sugar pts</th></tr></thead>
+    <tbody>
+      <tr><td>Proportional</td><td class="r num">5.4</td><td class="r num">21.7</td><td class="r num">7.2</td><td class="r num">10.9</td><td class="r num">−5.7</td><td class="r num">−0.8</td></tr>
+      <tr><td>Drinking water first</td><td class="r num">15.0</td><td class="r num">14.5</td><td class="r num">4.9</td><td class="r num">30.0</td><td class="r num">−23.7</td><td class="r num">−8.5</td></tr>
+      <tr><td>Irrigation first</td><td class="r num">0.0</td><td class="r num">25.8</td><td class="r num">8.6</td><td class="r num">0.0</td><td class="r num">4.5</td><td class="r num">3.5</td></tr>
+    </tbody>
+  </table></div>
+  <p><em>Lesson: the same water, shared under three rules, produces three different sets of winners. Lowering the Environment reserve would release more water but stress the wetland. Planting less rice before the drought (the forecast said El Niño) was the cheapest way out.</em></p>
+
+  <h3>11.4 Season 4: the same downstream decisions, three upstream basins</h3>
+  <p>Downstream teams make identical decisions in all three runs (medium fertilizer, release 40 in season 4). Only the upstream setting differs, held from season 1.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Upstream</th><th class="r">Inflow</th><th class="r">N load in, t</th><th class="r">Sediment in, t</th><th class="r">N, mg/L</th><th class="r">Sediment, mg/L</th><th class="r">GWI pts</th><th class="r">Mahaica pts</th><th class="r">EPA pts</th></tr></thead>
+    <tbody>
+      <tr><td>Pristine forest</td><td class="r num">130.9</td><td class="r num">52</td><td class="r num">1,047</td><td class="r num">0.24</td><td class="r num">2</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
+      <tr><td>Current practice</td><td class="r num">140.0</td><td class="r num">176</td><td class="r num">9,820</td><td class="r num">0.61</td><td class="r num">15</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
+      <tr><td>Expansion</td><td class="r num">154.4</td><td class="r num">512</td><td class="r num">48,935</td><td class="r num">1.45</td><td class="r num" style="color:var(--bad)">64.5</td><td class="r num">16.5</td><td class="r num">15</td><td class="r num">10</td></tr>
+    </tbody>
+  </table></div>
+  <p>Step by step for the expansion case. Start: storage 213.3 Mm³ holding 220.7 t N and 7,899 t sediment. Inflow is 120 × 1.0 × 1.090 × 1.18 = 154.4 (land clearing adds 18%), evaporation 15, so the mixing volume is 352.7 Mm³. Nitrogen in: 0.4 × 154.4 = 61.8 natural plus 9 × 200 × 0.25 = 450 from upstream farms. Equation (15): (220.7 + 61.8 + 450) × 0.7 / 352.7 = <strong class="num">1.45 mg/L</strong> (caution). Sediment in: 1,235 natural + 2,700 from cleared land + 45,000 from large-scale mining; (7,899 + 48,935) × 0.4 / 352.7 = <strong class="num">64.5 mg/L</strong> (poor).</p>
+  <p>Consequences: GWI's treatment cost is 0.25 × (64.5 − 25) + 8 × (1.45 − 1.0) = 13.5, so GWI scores 16.5 instead of 30. The 40 Mm³ release carries poor water into the Mahaica River, harming livestock (−15 × 0.6 = −9). The EPA team loses its clean-water bonus. <em>Lesson: downstream teams did nothing differently, yet three of them lost points. Their only options are to negotiate with, pay, or lobby for regulation of a basin they do not control.</em></p>
+
+  <h3>11.5 Season 2: coastal fertilizer and the estuary</h3>
+  <p>La Niña long wet season, operator release 120, upstream on current practice. Only the coastal farms' fertilizer choice and the EPA rule change:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Coastal choice</th><th class="r">N to estuary, t</th><th>Estuary</th><th class="r">Rice pts</th><th class="r">Sugar pts</th><th class="r">EPA pts</th></tr></thead>
+    <tbody>
+      <tr><td>Medium fertilizer</td><td class="r num">480</td><td style="color:var(--warn)">Caution</td><td class="r num">90</td><td class="r num">40</td><td class="r num">35</td></tr>
+      <tr><td>High fertilizer</td><td class="r num">690</td><td style="color:var(--bad)">Poor</td><td class="r num">101</td><td class="r num">43</td><td class="r num">15</td></tr>
+      <tr><td>High fertilizer + EPA buffer strips</td><td class="r num">501</td><td style="color:var(--warn)">Caution</td><td class="r num">96</td><td class="r num">41</td><td class="r num">35</td></tr>
+    </tbody>
+  </table></div>
+  <p><em>Lesson: high fertilizer earns the farms 14 more points but costs the coast 20. Buffer strips recover most of the environmental damage while leaving the farms better off than at medium. Regulation that is designed well need not be a straight loss for producers.</em></p>
+
+  <h2 id="limits"><span class="n">12</span>Assumptions and limits</h2>
+  <div class="callout warn"><p>This is a teaching model. It is deliberately simple so players can follow it. Do not use its numbers for design, operation or planning decisions.</p></div>
+  <ul>
+    <li><strong>Lumped storage:</strong> one well-mixed reservoir; no spatial detail, canals, conveyance losses or travel times.</li>
+    <li><strong>Seasonal time step:</strong> peaks inside a season (a three-day storm) are averaged out. Real overtopping risk depends on daily or hourly inflows.</li>
+    <li><strong>No level–area–volume curve:</strong> storage is used directly; evaporation does not shrink as the water surface shrinks.</li>
+    <li><strong>Inflow is exogenous:</strong> runoff is a seasonal base value times a climate factor, not calculated from rainfall, soils and land use.</li>
+    <li><strong>No groundwater, no water quality,</strong> no return flows from irrigation, and no drainage from the coastal lands into the conservancy.</li>
+    <li><strong>Fixed order of operations:</strong> deliveries are made before releases each season.</li>
+    <li><strong>Simple economics:</strong> linear revenue and cost per hectare, flat damage per Mm³; points are not dollars.</li>
+    <li><strong>Forecast skill is uniform</strong> across seasons, and climate states are independent from one season to the next.</li>
+    <li><strong>Two quality indicators only:</strong> nitrogen stands in for all nutrients (phosphorus is often the limiting nutrient in fresh water) and suspended sediment for mining impacts. Mercury, pesticides, bacteria, dissolved oxygen and salinity are not modelled.</li>
+    <li><strong>Fully mixed conservancy:</strong> real conservancies have stagnant corners and plumes near inflows; concentrations near intakes can differ greatly from the average.</li>
+    <li><strong>Constant removal rates:</strong> uptake and settling do not vary with temperature, residence time or depth, and settled sediment never resuspends.</li>
+    <li><strong>No load from the coastal lands into the conservancy,</strong> and coastal farm runoff goes straight to the estuary with no delay or treatment in drainage canals.</li>
+  </ul>
+
+  <h2 id="calibration"><span class="n">13</span>Using real data and WEAP</h2>
+  <p>The game is not built on WEAP, but the two work well together.</p>
+  <h3>13.1 Calibrating the game</h3>
+  <ol>
+    <li>Gather conservancy storage at key levels (dead, safe operating, crest) from the level–volume relationship, and convert to Mm³.</li>
+    <li>Estimate seasonal inflow from gauged or modelled runoff, and evaporation from pan or Penman–Monteith estimates multiplied by surface area.</li>
+    <li>Set demands from abstraction records: GWI treatment-plant intake, irrigated areas and seasonal crop water requirements.</li>
+    <li>Set climate factors from historical El Niño and La Niña seasons compared with normal seasons, using hydrometeorological records.</li>
+    <li>Enter the values under Settings and test a full game to check the balance behaves sensibly.</li>
+  </ol>
+  <p><strong>Water quality:</strong> use raw-water monitoring at GWI intakes and EPA or GGMC sampling for nitrogen and turbidity or TSS; fertilizer application rates from extension services or farmer surveys; mining footprint from satellite imagery (the land-cover change methods used in GIS courses apply directly). Calibrate the removal rates <i>k</i><sub>N</sub> and <i>k</i><sub>T</sub> so the model reproduces observed seasonal concentrations.</p>
+  <h3>13.2 Linking to WEAP</h3>
+  <ul>
+    <li><strong>WEAP → game:</strong> build a WEAP model of the system with the conservancy as a reservoir and GWI, rice and sugar as demand sites. Run it for typical, wet and dry years and use the seasonal totals as the game's inflows and demands.</li>
+    <li><strong>Game → WEAP:</strong> export the game's results as CSV. Take the planting areas, reserve level and allocation rule the teams settled on, and test them as a WEAP scenario with full hydrology and a monthly or daily time step. WEAP's demand priorities correspond to the game's allocation rules.</li>
+    <li><strong>Water quality in WEAP:</strong> WEAP can carry pollutant loads with demand sites and catchments and has a link to QUAL2K, so the game's quality scenarios can also be tested there.</li>
+    <li><strong>Workshop sequence:</strong> play the game first to build intuition about trade-offs, then train participants to build the same system in WEAP, then compare the two.</li>
+  </ul>
+
+  <h2 id="facilitation"><span class="n">14</span>Facilitation and debrief</h2>
+  <h3>14.1 Suggested timetable (about 2 hours)</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Time</th><th>Activity</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0:00–0:15</td><td>Introduce IWRM, the conservancy and the roles. Teams read their role cards.</td></tr>
+      <tr><td class="num">0:15–0:25</td><td>Practice season with the facilitator explaining each screen. Then restart.</td></tr>
+      <tr><td class="num">0:25–1:30</td><td>Eight seasons at about 8 minutes each.</td></tr>
+      <tr><td class="num">1:30–2:00</td><td>Debrief, using the storage chart and the event log.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>14.2 Debrief questions</h3>
+  <ul>
+    <li><strong>Experience:</strong> How did your team feel during the flood season and the drought? Which decision do you regret?</li>
+    <li><strong>System:</strong> Looking at the storage chart, when did the basin get into trouble, and which earlier decisions set that up?</li>
+    <li><strong>Equity:</strong> Who carried the cost of protecting the dam? Was it agreed or imposed? Should Mahaica be compensated, and by whom?</li>
+    <li><strong>Rules:</strong> Which allocation rule did you choose, and did it change in the drought? Which is fairest? How does it compare with Guyana's law and practice?</li>
+    <li><strong>Information:</strong> How much did you trust the forecast? What monitoring, forecasting or data sharing would have helped?</li>
+    <li><strong>Institutions:</strong> What body should make these decisions in reality? What would a basin council for the conservancy need to work?</li>
+    <li><strong>Quality:</strong> When did water quality get worse, and was it because of more pollution or less water? How could you tell the difference?</li>
+    <li><strong>Upstream:</strong> How did it feel to lose points to a basin you could not influence? What changed once the upstream teams were at the table? Which agencies in Guyana would need to sit on a body that covers both basins?</li>
+    <li><strong>Payments:</strong> Did anyone pay the upstream miners to use settling ponds, or the coastal farms to use less fertilizer? Who should pay: the polluter or the beneficiary?</li>
+    <li><strong>Transfer:</strong> Where do you see the same pattern in your own work?</li>
+  </ul>
+  <h3>14.3 Variations</h3>
+  <ul>
+    <li><strong>No talking:</strong> play two seasons without negotiation, then allow it, and compare.</li>
+    <li><strong>Perfect forecast:</strong> set accuracy to 1.0 to show the value of information; set it to 0.33 for no skill.</li>
+    <li><strong>Climate change:</strong> lower dry-season inflows or raise La Niña frequency in the script.</li>
+    <li><strong>Growing city:</strong> raise GWI's base need mid-game to model population growth.</li>
+    <li><strong>Upstream ambush:</strong> switch the upstream basin to expansion halfway through without announcing it, and see how long downstream teams take to find the cause.</li>
+    <li><strong>Two runs, one seed:</strong> play once downstream-only and once with upstream teams, and compare the quality charts.</li>
+    <li><strong>Assessment:</strong> ask students to write a short policy brief recommending an operating rule, supported by their game data.</li>
+  </ul>
+
+  <h3>14.4 Playing with several tables</h3>
+  <p>A <strong>team</strong> is one stakeholder role, played by one or more people. A <strong>table</strong> is one complete basin: a full set of roles running its own copy of the game. There are two ways to organise the room.</p>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>One basin, one table per role</th><th>Several basins, each table plays every role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Group size</strong></td><td>6–24 people (1–4 per role), plus 2 upstream tables if used</td><td>Any size, in tables of 6–10 (1–2 people per role)</td></tr>
+      <tr><td><strong>Screens</strong></td><td>One projector; the facilitator enters every decision</td><td>One laptop or tablet per table, all opening the same GitHub link</td></tr>
+      <tr><td><strong>Strength</strong></td><td>Loud, visible negotiation across the room</td><td>Several outcomes to compare under identical weather</td></tr>
+      <tr><td><strong>Weakness</strong></td><td>One outcome only; large groups sit idle</td><td>Less cross-room drama</td></tr>
+    </tbody>
+  </table></div>
+  <p>A useful hybrid for 20–30 participants: play seasons 1–4 as one basin on the projector so everyone learns the game, then split into 3–4 tables for seasons 5–8 and compare.</p>
+  <p><strong>Running several tables at once.</strong> The game runs entirely in each browser, so any number of tables can open the same link at the same time and each gets an independent game. Internet is only needed to load the page. Give each table these rules:</p>
+  <ul>
+    <li>Enter a table name at the top before starting.</li>
+    <li>Do not change Settings. All tables share the same seed, so they face the same weather, forecasts and forecast errors.</li>
+    <li>Do not refresh or close the tab: the game does not save, and reloading starts over.</li>
+    <li>Use Undo only to correct a typing mistake.</li>
+    <li>Each person argues for their own role, not for the table's total.</li>
+    <li>Switch the upstream basin only when the facilitator announces it to the whole room.</li>
+  </ul>
+  <p><strong>Collecting and comparing results.</strong> When a table finishes, it uses <em>Download results file</em> and sends the file to the facilitator by WhatsApp, email or USB, or uses <em>Copy results code</em> and pastes the code into a message. The facilitator opens the <a href="compare.html">Compare tables</a> page on the projector and drops in the files or pastes the codes. Nothing is uploaded anywhere: the comparison happens on the facilitator's computer, and it works offline from a local copy.</p>
+  <p>The comparison page shows a scorecard ranked by any column (share of demand met, dam breaches, Mahaica flood seasons, seasons of poor conservancy and coastal water, downstream and upstream points), the storage and quality curves of every table on shared charts, points by role, and the main choices each table made. It warns if tables used different settings, played different numbers of seasons, or set the upstream basin differently.</p>
+  <p>The <strong>basin health index</strong> combines the scorecard into one number: 100 × share of demand met − 25 per dam breach − 10 per season of Mahaica flooding, poor conservancy water or poor coastal water. Treat it as a prompt for discussion rather than a verdict: the table with the most points is often not the healthiest basin, and that contrast makes a strong debrief.</p>
+
+  <h2 id="glossary"><span class="n">15</span>Glossary</h2>
+  <div class="scroll"><table>
+    <tbody>
+      <tr><td><strong>Conservancy</strong></td><td>A large shallow reservoir behind an earthen dam on Guyana's coast, storing water for supply and irrigation and protecting the coast from inland flooding.</td></tr>
+      <tr><td><strong>Mm³</strong></td><td>Million cubic metres. 1 Mm³ is 1,000,000 m³, or 1 billion litres.</td></tr>
+      <tr><td><strong>Water balance</strong></td><td>Accounting of all water entering and leaving a system; the difference is the change in storage.</td></tr>
+      <tr><td><strong>Dead storage</strong></td><td>Water below the lowest outlet, which cannot be withdrawn.</td></tr>
+      <tr><td><strong>Relief sluice</strong></td><td>A gated structure used to release water from the conservancy to a river to lower its level.</td></tr>
+      <tr><td><strong>Overtopping</strong></td><td>Water flowing over the crest of a dam; it erodes earthen dams and can cause failure.</td></tr>
+      <tr><td><strong>Externality</strong></td><td>A cost or benefit that falls on someone who did not make the decision.</td></tr>
+      <tr><td><strong>ENSO</strong></td><td>El Niño–Southern Oscillation. In coastal Guyana El Niño tends to bring drier conditions and La Niña wetter ones.</td></tr>
+      <tr><td><strong>Nonpoint-source pollution</strong></td><td>Pollution that comes from a wide area, such as fertilizer runoff from fields, rather than from a single pipe.</td></tr>
+      <tr><td><strong>Eutrophication</strong></td><td>Over-enrichment of water with nutrients, leading to algal blooms, oxygen depletion and fish kills.</td></tr>
+      <tr><td><strong>TSS</strong></td><td>Total suspended solids: the sediment carried in water, measured in mg/L. High TSS makes water muddy.</td></tr>
+      <tr><td><strong>Koker</strong></td><td>A sluice gate in Guyana's sea defences and drainage canals that lets water drain to the sea at low tide.</td></tr>
+      <tr><td><strong>Buffer strip</strong></td><td>A strip of vegetation left between fields and a drain or waterway to trap sediment and nutrients.</td></tr>
+      <tr><td><strong>Payment for ecosystem services</strong></td><td>An arrangement in which those who benefit from clean water pay land users upstream to protect it.</td></tr>
+      <tr><td><strong>Common-pool resource</strong></td><td>A resource from which it is hard to exclude users and whose use by one reduces what is left for others.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="references"><span class="n">16</span>References</h2>
+  <ol class="refs">
+    <li>Global Water Partnership (2000). <em>Integrated Water Resources Management.</em> TAC Background Paper No. 4. Stockholm: GWP.</li>
+    <li>International Conference on Water and the Environment (1992). <em>The Dublin Statement on Water and Sustainable Development.</em> Dublin.</li>
+    <li>Hardin, G. (1968). The tragedy of the commons. <em>Science</em>, 162(3859), 1243–1248.</li>
+    <li>Ostrom, E. (1990). <em>Governing the Commons: The Evolution of Institutions for Collective Action.</em> Cambridge University Press.</li>
+    <li>Lankford, B.A., Sokile, C., Yawson, D.K. and Lévite, H. (2004). <em>The River Basin Game: A Water Dialogue Tool.</em> IWMI Working Paper 75. Colombo: International Water Management Institute.</li>
+    <li>Seibert, J. and Vis, M.J.P. (2012). Irrigania – a web-based game about sharing water resources. <em>Hydrology and Earth System Sciences</em>, 16, 2523–2530. doi:10.5194/hess-16-2523-2012</li>
+    <li>Abrami, G., Ferrand, N., Morardet, S., et al. (2012). Wat-A-Game, a toolkit for building role-playing games about integrated water management. <em>iEMSs 2012</em>, Leipzig.</li>
+    <li>Barreteau, O., et al. (2003). Our companion modelling approach. <em>Journal of Artificial Societies and Social Simulation</em>, 6(2).</li>
+    <li>Yates, D., Sieber, J., Purkey, D. and Huber-Lee, A. (2005). WEAP21 – A demand-, priority-, and preference-driven water planning model. <em>Water International</em>, 30(4), 487–500.</li>
+    <li>Kolb, D.A. (1984). <em>Experiential Learning: Experience as the Source of Learning and Development.</em> Prentice Hall.</li>
+    <li>Carpenter, S.R., Caraco, N.F., Correll, D.L., Howarth, R.W., Sharpley, A.N. and Smith, V.H. (1998). Nonpoint pollution of surface waters with phosphorus and nitrogen. <em>Ecological Applications</em>, 8(3), 559–568.</li>
+    <li>Chapra, S.C. (1997). <em>Surface Water-Quality Modeling.</em> McGraw-Hill.</li>
+    <li>Mayer, I.S. (2009). The gaming of policy and the politics of gaming: A review. <em>Simulation &amp; Gaming</em>, 40(6), 825–862.</li>
+  </ol>
+
+  <footer>
+    Conservancy Council · Game documentation v2.0 · Faculty of Earth and Environmental Sciences, University of Guyana. Teaching material with illustrative data. <a href="index.html">Back to the game</a>.
+  </footer>
+</main>
+</div>
+</body>
+</html>
