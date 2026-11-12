@@ -137,7 +137,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
 <main>
   <h1>Conservancy Council</h1>
   <p class="lede">A role-play simulation of integrated water resources management (IWRM) for a coastal water conservancy in Guyana. This manual covers the rules, the theory behind the game, and every equation the model uses, for both water quantity and water quality.</p>
-  <div class="meta"><span>Version 2.0 · November 2026</span><span>Faculty of Earth and Environmental Sciences, University of Guyana</span><span>6 teams + 2 optional upstream teams · 8 seasons · about 2 hours</span></div>
+  <div class="meta"><span>Version 2.2 · November 2026</span><span>Faculty of Earth and Environmental Sciences, University of Guyana</span><span>6 teams + 2 optional upstream teams · 8 seasons · about 2 hours</span></div>
 
   <h2 id="overview"><span class="n">01</span>Overview</h2>
   <p>Six stakeholder teams share one water body: a coastal conservancy that stores rainfall runoff from its catchment behind an earthen dam. The conservancy supplies Georgetown's drinking water and irrigation for rice and sugar. In wet seasons it threatens the dam, and the operator must release water through relief sluices into the Mahaica River, where downstream villages farm the floodplain.</p>
@@ -282,9 +282,9 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <p>Each team controls one decision per season and is scored on its own interests. Team scores are on different scales, so the scoreboard compares progress, not worth.</p>
   <div class="roles">
     <div class="role" style="--c:var(--t-gwi)"><h4>GWI</h4><p>Supplies Georgetown's drinking water from the conservancy.</p><p><b>Decides:</b> abstraction request, 0–30 Mm³; whether to invest in leak repair.</p><p><b>Wants:</b> its full need met every season.</p><p class="k">Need 15 Mm³/season · repair −15 pts, −2 Mm³ need</p></div>
-    <div class="role" style="--c:var(--t-rice)"><h4>Rice farmers</h4><p>Irrigate coastal rice lands; the largest water user.</p><p><b>Decides:</b> area planted, 0–25 thousand ha, and fertilizer rate (low, medium, high).</p><p><b>Wants:</b> profit, which needs area, water and fertilizer. High fertilizer pays more but sends more nitrogen to the coast.</p><p class="k">4 Mm³ per k ha per dry season</p></div>
+    <div class="role" style="--c:var(--t-rice)"><h4>Rice farmers</h4><p>Irrigate coastal rice lands; the largest water user.</p><p><b>Decides:</b> area planted, 0–25 thousand ha, and fertilizer rate (low, medium, high), but only in a sowing window. A crop stays in the field for two seasons.</p><p><b>Wants:</b> profit, which needs area, water and fertilizer. High fertilizer pays more but sends more nitrogen to the coast.</p><p class="k">Sows in Dec–Jan and May–Aug · 4 Mm³ per k ha at peak</p></div>
     <div class="role" style="--c:var(--t-sugar)"><h4>Sugar estate</h4><p>Irrigates cane fields; less thirsty per hectare than rice.</p><p><b>Decides:</b> cane area irrigated, 0–15 thousand ha, and fertilizer rate.</p><p><b>Wants:</b> profit.</p><p class="k">2.5 Mm³ per k ha per dry season</p></div>
-    <div class="role" style="--c:var(--t-op)"><h4>Conservancy operator</h4><p>Responsible for dam safety and for keeping users supplied.</p><p><b>Decides:</b> release through the relief sluices, 0–150 Mm³.</p><p><b>Wants:</b> storage inside the safe band, no breach, users supplied.</p><p class="k">Sluice capacity 150 Mm³/season</p></div>
+    <div class="role" style="--c:var(--t-op)"><h4>Conservancy operator</h4><p>Responsible for dam safety and for deciding who gets water.</p><p><b>Decides:</b> the share of each user's need to supply (GWI, rice, sugar; 0–100%), and the release through the relief sluices, 0–150 Mm³.</p><p><b>Wants:</b> storage inside the safe band, no breach, users supplied.</p><p class="k">Sluice capacity 150 Mm³/season</p></div>
     <div class="role" style="--c:var(--t-mahaica)"><h4>Mahaica communities</h4><p>Villages and farms on the floodplain downstream of the sluices.</p><p><b>Decides:</b> how much farming and livestock to keep on the floodplain, 0–100%.</p><p><b>Wants:</b> income without flood losses or livestock harmed by polluted releases.</p><p class="k">River safe limit 60 Mm³/season</p></div>
     <div class="role" style="--c:var(--t-env)"><h4>Environment (EPA)</h4><p>Represents the wetlands, water quality and coastal ecosystems.</p><p><b>Decides:</b> protected minimum storage, 60–200 Mm³, and a rule for coastal farms: none, buffer strips, or a fertilizer cap.</p><p><b>Wants:</b> a healthy wetland, clean conservancy water and a healthy estuary. Has no authority upstream.</p><p class="k">Healthy above 120 Mm³</p></div>
     <div class="role" style="--c:var(--t-upfarm)"><h4>Upstream farmers <span style="font-weight:400;font-size:13px">(optional)</span></h4><p>Farms in the conservancy's catchment, in another jurisdiction.</p><p><b>Decides:</b> farmland, 0–12 thousand ha, and fertilizer rate.</p><p><b>Wants:</b> profit. Feels none of the downstream effects.</p><p class="k">60 / 120 / 200 kg N/ha by rate</p></div>
@@ -311,6 +311,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <h3>6.3 Other rules</h3>
   <ul>
     <li>Decisions carry over to the next season unless a team changes them. Leak repair must be chosen again each season it is wanted.</li>
+    <li>Rice farmers may change their area and fertilizer only in a sowing window: the short wet season (spring crop) and the long wet season (autumn crop), and in season 1 to set the crop already in the ground. In the other seasons the game locks their controls, because the crop is already planted.</li>
     <li><em>Undo last season</em> exists to fix data-entry mistakes, not to replay bad luck.</li>
     <li>Optional compensation rule: teams may agree to transfer points (for example, GWI pays Mahaica for accepting a release). The facilitator records transfers by hand and adjusts final scores.</li>
     <li>The game ends after the last season (default 8). The basin total and each team's score feed into the debrief. There is no single winner; ask whether the basin as a whole did well.</li>
@@ -348,17 +349,19 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
 
   <h3>7.4 Demands</h3>
   <div class="eq"><div class="f"><i>d</i><sub>GWI</sub> = request<sub>GWI</sub> &nbsp;&nbsp; <i>d</i><sub>rice</sub> = <i>a</i><sub>rice</sub> × <i>w</i><sub>rice</sub> × <i>φ<sub>s</sub></i> &nbsp;&nbsp; <i>d</i><sub>sugar</sub> = <i>a</i><sub>sugar</sub> × <i>w</i><sub>sugar</sub> × <i>φ<sub>s</sub></i></div><div class="tag">(5)</div></div>
-  <p class="where">where <b>a</b> is area in thousand hectares, <b>w</b> is the water requirement per thousand hectares in a fully dry season (rice 4.0, sugar 2.5 Mm³), and <b>φ<sub>s</sub></b> is the crop water factor: 1.0 in dry seasons, 0.5 in the long wet season and 0.6 in the short wet season, because rain supplies part of the crops' needs.</p>
+  <p class="where">where <b>a</b> is area in thousand hectares, <b>w</b> is the water requirement per thousand hectares in a fully dry season (rice 4.0, sugar 2.5 Mm³), and <b>φ<sub>s</sub></b> is the crop water factor for the season. For sugar it is 1.0 in dry seasons, 0.5 in the long wet season and 0.6 in the short wet season, because rain supplies part of the crop's needs. For rice it follows the crop calendar in section 9.1: 0.7 at spring-crop sowing (short wet), 1.0 while the spring crop matures in the long dry season, 0.6 at autumn-crop sowing (long wet) and 0.5 in the short dry season, when the autumn crop is drained for harvest and fields lie fallow in November.</p>
   <p>GWI's real <em>need</em> is separate from its <em>request</em>:</p>
   <div class="eq"><div class="f"><i>n</i><sub>GWI,t</sub> = max(0, <i>n</i><sub>GWI</sub> − Δ<i>n</i> × <i>L<sub>t</sub></i>)</div><div class="tag">(6)</div></div>
   <p class="where">where <b>n</b><sub>GWI</sub> = 15 Mm³ is the base need, <b>Δn</b> = 2 Mm³ is the saving per leak repair, and <b>L<sub>t</sub></b> is the number of repairs made in earlier seasons. A repair takes effect from the following season.</p>
 
   <h3>7.5 Allocation</h3>
-  <p>If total demand <i>Σd</i> ≤ <i>A<sub>t</sub></i>, every user receives its demand in full. Otherwise the council's rule shares out <i>A<sub>t</sub></i>:</p>
+  <p>The operator first sets how much of each user's demand to supply, as a share <i>σ<sub>i</sub></i> between 0 and 100%:</p>
+  <div class="eq"><div class="f"><i>q<sub>i</sub></i> = <i>d<sub>i</sub></i> × <i>σ<sub>i</sub></i></div><div class="tag">(6b)</div></div>
+  <p>Water the operator does not allocate (<i>d<sub>i</sub></i> − <i>q<sub>i</sub></i>) stays in the conservancy. If the total allocation <i>Σq</i> ≤ <i>A<sub>t</sub></i>, every user receives its allocation in full. Otherwise the council's rule shares out <i>A<sub>t</sub></i>, applied to the allocations <i>q<sub>i</sub></i> in place of the demands <i>d<sub>i</sub></i> below:</p>
   <div class="eq"><div class="f"><b>Proportional:</b> &nbsp; <i>D<sub>i</sub></i> = <i>d<sub>i</sub></i> × <i>A<sub>t</sub></i> / <i>Σd</i></div><div class="tag">(7a)</div></div>
   <div class="eq"><div class="f"><b>Drinking water first:</b> &nbsp; <i>D</i><sub>GWI</sub> = min(<i>d</i><sub>GWI</sub>, <i>A<sub>t</sub></i>); the remainder <i>A<sub>t</sub></i> − <i>D</i><sub>GWI</sub> is shared proportionally between rice and sugar</div><div class="tag">(7b)</div></div>
   <div class="eq"><div class="f"><b>Irrigation first:</b> &nbsp; rice and sugar share <i>A<sub>t</sub></i> proportionally up to their demand; GWI receives what remains</div><div class="tag">(7c)</div></div>
-  <p>Total delivered water is <i>D<sub>t</sub></i> = <i>D</i><sub>GWI</sub> + <i>D</i><sub>rice</sub> + <i>D</i><sub>sugar</sub>, and the deficit is <i>Σd</i> − <i>D<sub>t</sub></i>.</p>
+  <p>Total delivered water is <i>D<sub>t</sub></i> = <i>D</i><sub>GWI</sub> + <i>D</i><sub>rice</sub> + <i>D</i><sub>sugar</sub>, and the deficit is <i>Σd</i> − <i>D<sub>t</sub></i>, measured against what users needed, not what they were allocated. Users are scored on the share of their need that was met, so an operator's cut costs them yield or reliability whether it came from scarcity or from a decision to save water.</p>
 
   <h3>7.6 Release</h3>
   <p>Deliveries come first; the operator's release is then limited by the sluice capacity and by the water left above dead storage:</p>
@@ -394,7 +397,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <h3>7.11 Nitrogen reaching the estuary</h3>
   <p>Coastal farm drainage bypasses the conservancy and goes to the sea. Released and overtopped conservancy water also reaches the coast through the Mahaica River:</p>
   <div class="eq"><div class="f"><i>N</i><sub>coast</sub> = (<i>a</i><sub>rice</sub> <i>N</i><sub>rice</sub> + <i>a</i><sub>sugar</sub> <i>N</i><sub>sugar</sub>) × <i>x<sub>s</sub></i> × (1 − 0.3 [buffer]) + (<i>R<sub>t</sub></i> + <i>O<sub>t</sub></i>) × <i>C</i><sub>N,<i>t</i></sub></div><div class="tag">(17)</div></div>
-  <p class="where">where <b>N</b><sub>rice</sub> is 40, 80 or 120 and <b>N</b><sub>sugar</sub> is 30, 60 or 90 kg N/ha by fertilizer rate. Buffer strips cut farm runoff by 30%. Under the EPA fertilizer cap, a "high" choice is applied as "medium".</p>
+  <p class="where">where <b>N</b><sub>rice</sub> is the rice fertilizer applied in the season: 70, 120 or 170 kg N/ha per crop by rate, of which 60% is applied in the sowing season and 40% in the following season. <b>N</b><sub>sugar</sub> is 30, 60 or 90 kg N/ha per season. Buffer strips cut farm runoff by 30%. Under the EPA fertilizer cap, a "high" choice is applied as "medium".</p>
 
   <h3>7.12 Quality status</h3>
   <div class="scroll"><table>
@@ -402,7 +405,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <tbody>
       <tr><td>Conservancy nitrogen, mg/L</td><td class="r num">≤ 1.0</td><td class="r num">1.0–2.0</td><td class="r num">&gt; 2.0</td></tr>
       <tr><td>Conservancy suspended sediment, mg/L</td><td class="r num">≤ 25</td><td class="r num">25–60</td><td class="r num">&gt; 60</td></tr>
-      <tr><td>Nitrogen reaching the estuary, t/season</td><td class="r num">≤ 450</td><td class="r num">450–650</td><td class="r num">≥ 650</td></tr>
+      <tr><td>Nitrogen reaching the estuary, t/season</td><td class="r num">≤ 425</td><td class="r num">425–600</td><td class="r num">≥ 600</td></tr>
     </tbody>
   </table></div>
   <p>Conservancy water is "poor" if either indicator is poor, "caution" if either is in caution. These thresholds are teaching values chosen to make the game's dynamics visible, not regulatory standards.</p>
@@ -437,14 +440,17 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <h2 id="climate"><span class="n">09</span>Climate and forecasts</h2>
   <p>Seasons follow Guyana's coastal bimodal rainfall pattern and repeat in this order:</p>
   <div class="scroll"><table>
-    <thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Crop factor φ</th></tr></thead>
+    <thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Sugar φ</th><th>Rice crop stage</th><th class="r">Rice φ</th><th class="r">Share of crop N</th></tr></thead>
     <tbody>
-      <tr><td>Long dry</td><td>Feb–Apr</td><td class="r num">40</td><td class="r num">35</td><td class="r num">1.0</td></tr>
-      <tr><td>Long wet</td><td>May–Aug</td><td class="r num">220</td><td class="r num">25</td><td class="r num">0.5</td></tr>
-      <tr><td>Short dry</td><td>Sep–Nov</td><td class="r num">35</td><td class="r num">40</td><td class="r num">1.0</td></tr>
-      <tr><td>Short wet</td><td>Dec–Jan</td><td class="r num">120</td><td class="r num">15</td><td class="r num">0.6</td></tr>
+      <tr><td>Long dry</td><td>Feb–Apr</td><td class="r num">40</td><td class="r num">35</td><td class="r num">1.0</td><td>Spring crop matures, harvested Mar–Apr</td><td class="r num">1.0</td><td class="r num">40%</td></tr>
+      <tr><td>Long wet</td><td>May–Aug</td><td class="r num">220</td><td class="r num">25</td><td class="r num">0.5</td><td><strong>Sowing window:</strong> autumn crop</td><td class="r num">0.6</td><td class="r num">60%</td></tr>
+      <tr><td>Short dry</td><td>Sep–Nov</td><td class="r num">35</td><td class="r num">40</td><td class="r num">1.0</td><td>Autumn crop harvested Sep–Oct; fallow in Nov</td><td class="r num">0.5</td><td class="r num">40%</td></tr>
+      <tr><td>Short wet</td><td>Dec–Jan</td><td class="r num">120</td><td class="r num">15</td><td class="r num">0.6</td><td><strong>Sowing window:</strong> spring crop</td><td class="r num">0.7</td><td class="r num">60%</td></tr>
     </tbody>
   </table></div>
+  <h3>9.1 Rice crop calendar</h3>
+  <p>Guyana grows two rice crops a year. Following the Guyana Rice Development Board (GRDB), the first (spring) crop is sown in November–December and harvested in March–April, and the second (autumn) crop is sown around May–June and reaped in September–October. The GRDB advises sowing between 15 November and 31 December for the first crop and between 15 May and 30 June for the second, so that the crop flowers when sunlight is strongest. Sowing is timed to the start of the rainy seasons, while harvesting falls in the dry seasons. Rain helps flood and puddle the fields, but two crops a year still depend on reliable irrigation, because rain is irregular and dry spells are common.</p>
+  <p>In the game, each crop spans two seasons. Rice farmers choose area and fertilizer in the sowing season and are locked into them for the following season. They must commit before they know whether the outlook is right: an El Niño arriving after sowing leaves a large crop to be carried through a dry season. In the real calendar, sowing starts in mid-November at the end of the short dry season. The game counts it in the short wet season for simplicity.</p>
   <p>The default climate script for the eight seasons is: Normal, <strong>La Niña</strong>, Normal, Normal, <strong>El Niño</strong>, Normal, <strong>El Niño</strong>, <strong>La Niña</strong>. The early La Niña long-wet season tests flood management; the later El Niño dry seasons test drought management. In <em>random</em> mode each season is El Niño with probability 0.25, Normal 0.5 and La Niña 0.25.</p>
   <p><strong>Forecast:</strong> with probability <i>p</i> (default 0.7) the outlook equals the actual climate; otherwise it shows one of the other two states at random. Weather is generated from a fixed random seed, so two groups playing with the same seed face identical weather and forecasts, which makes groups comparable.</p>
 
@@ -476,7 +482,9 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
       <tr><td>Natural nitrogen / sediment in inflow</td><td class="r num">0.4 / 8</td><td>mg/L</td><td>Eqs. 13, 14</td></tr>
       <tr><td>Removal per season, nitrogen / sediment</td><td class="r num">0.3 / 0.6</td><td>fraction</td><td>Eq. 15</td></tr>
       <tr><td>Nitrogen washed off, wet / dry</td><td class="r num">0.25 / 0.08</td><td>fraction</td><td>Eqs. 13, 17</td></tr>
-      <tr><td>Coastal fertilizer, rice / sugar</td><td class="r num">40–80–120 / 30–60–90</td><td>kg N/ha</td><td>Eq. 17</td></tr>
+      <tr><td>Rice fertilizer per crop (60% at sowing, 40% next season)</td><td class="r num">70–120–170</td><td>kg N/ha</td><td>Eq. 17</td></tr>
+      <tr><td>Sugar fertilizer per season</td><td class="r num">30–60–90</td><td>kg N/ha</td><td>Eq. 17</td></tr>
+      <tr><td>Rice water factor by season</td><td class="r num">1.0 / 0.6 / 0.5 / 0.7</td><td>long dry / long wet / short dry / short wet</td><td>Eq. 5</td></tr>
       <tr><td>Upstream fertilizer</td><td class="r num">60–120–200</td><td>kg N/ha</td><td>Eq. 13</td></tr>
       <tr><td>Mining sediment by scale</td><td class="r num">0–5,000–14,000–30,000</td><td>t/season</td><td>Eq. 14</td></tr>
       <tr><td>Settling pond removal / cost</td><td class="r num">0.7 / 12</td><td>fraction / points</td><td>Eq. 14, miners' score</td></tr>
@@ -487,60 +495,61 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   </table></div>
 
   <h2 id="examples"><span class="n">11</span>Worked examples</h2>
-  <p>All three examples use the default settings and the starting decisions: GWI requests 15, rice 15k ha, sugar 8k ha, Environment reserve 90, Mahaica activity 60%.</p>
+  <p>All examples use the default settings, with the upstream basin on <em>current practice</em> unless stated, and the starting decisions: GWI requests 15, rice 15k ha and sugar 8k ha on medium fertilizer, Environment reserve 90 with no farm rule, Mahaica activity 60%. Every number was produced by the game's own model.</p>
   <h3>11.1 Season 1: a normal long dry season</h3>
-  <p>Start storage 200. The seeded noise is −5.7%, so inflow is 40 × 1.0 × 0.943 = <span class="num">37.7</span>; evaporation is <span class="num">35</span>. The floor is max(60, 90) = 90, so available water is 200 + 37.7 − 35 − 90 = <span class="num">112.7</span>.</p>
-  <p>Demands: GWI 15, rice 15 × 4.0 × 1.0 = 60, sugar 8 × 2.5 × 1.0 = 20; total 95. That is less than 112.7, so every user is fully supplied. With a release of 20, end storage is 200 + 37.7 − 35 − 95 − 20 = <strong class="num">87.7</strong>.</p>
-  <p>Scores: GWI 30; rice 15 × (10 − 4) = 90; sugar 8 × (8 − 3) = 40; operator 20 + 10 = 30; Mahaica 40 × 0.6 = 24; Environment −25, because 87.7 is below the wetland level of 120. <em>Lesson: full supply in a dry season can leave the ecosystem, and the next season, short.</em></p>
+  <p>Start storage 200. The seeded noise is −5.7%, and current upstream land use trims dry-season inflow by 4.7% (equation 12), so inflow is 40 × 1.0 × 0.943 × 0.953 = <span class="num">35.9</span>; evaporation is <span class="num">35</span>. The floor is max(60, 90) = 90, so available water is 200 + 35.9 − 35 − 90 = <span class="num">110.9</span>.</p>
+  <p>Demands: GWI 15; rice 15 × 4.0 × 1.0 = 60, because the spring crop is maturing; sugar 8 × 2.5 × 1.0 = 20; total 95. That is less than 110.9, so every user is fully supplied. With a release of 20, end storage is 200 + 35.9 − 35 − 95 − 20 = <strong class="num">85.9</strong>.</p>
+  <p>Scores: GWI 30; rice 15 × (10 − 4) = 90; sugar 8 × (8 − 3) = 40; operator 20 + 10 = 30; Mahaica 40 × 0.6 = 24; Environment −5 (−25 because 85.9 is below the wetland level of 120, +10 for clean conservancy water, +10 for a healthy estuary). <em>Lesson: full supply in a dry season can leave the ecosystem, and the next season, short.</em></p>
 
   <h3>11.2 Season 2: La Niña and the operator's dilemma</h3>
-  <p>Start storage 87.7. La Niña inflow is 220 × 1.7 × 1.036 = <span class="num">387.3</span>. Demands are smaller in the wet season (rice 30, sugar 10, GWI 15). The operator's choice decides who pays:</p>
+  <p>Start storage 85.9. La Niña inflow is 220 × 1.7 × 1.036 × 1.07 = <span class="num">414.4</span> (upstream clearing adds 7% in wet seasons). Demands are smaller in the wet season: the autumn rice crop is being sown (15 × 4.0 × 0.6 = 36), sugar 10, GWI 15. The operator's choice decides who pays:</p>
   <div class="scroll"><table>
-    <thead><tr><th>Operator release</th><th class="r">End storage</th><th>Dam</th><th class="r">Mahaica damage</th><th class="r">Operator pts</th><th class="r">Mahaica pts</th></tr></thead>
+    <thead><tr><th>Operator release</th><th class="r">End storage</th><th>Dam</th><th class="r">Mahaica damage</th><th class="r">Operator pts</th><th class="r">Mahaica pts</th><th class="r">GWI pts</th></tr></thead>
     <tbody>
-      <tr><td>20 Mm³ (cautious with the river)</td><td class="r num">340</td><td style="color:var(--bad)">Overtops by 35: breach</td><td class="r num">0</td><td class="r num">−90</td><td class="r num">−26</td></tr>
-      <tr><td>85 Mm³ (compromise)</td><td class="r num">310</td><td style="color:var(--warn)">Above the safe limit</td><td class="r num">18</td><td class="r num">−20</td><td class="r num">6</td></tr>
-      <tr><td>150 Mm³ (full sluices)</td><td class="r num">245</td><td style="color:var(--good)">Safe</td><td class="r num">64.8</td><td class="r num">30</td><td class="r num">−40.8</td></tr>
+      <tr><td>20 Mm³ (cautious with the river)</td><td class="r num">340</td><td style="color:var(--bad)">Overtops by 54: breach</td><td class="r num">0</td><td class="r num">−90</td><td class="r num">−26</td><td class="r num">−20</td></tr>
+      <tr><td>85 Mm³ (compromise)</td><td class="r num">329</td><td style="color:var(--warn)">Above the safe limit</td><td class="r num">18</td><td class="r num">−20</td><td class="r num">6</td><td class="r num">30</td></tr>
+      <tr><td>150 Mm³ (full sluices)</td><td class="r num">264</td><td style="color:var(--good)">Safe</td><td class="r num">64.8</td><td class="r num">30</td><td class="r num">−40.8</td><td class="r num">30</td></tr>
     </tbody>
   </table></div>
-  <p><em>Lesson: there is no option without a loser. A breach hurts everyone (all other teams lose 50); a full release protects the coast at Mahaica's expense. This is where compensation, early releases before the rain, or Mahaica reducing its floodplain exposure become worth negotiating.</em></p>
+  <p><em>Lesson: there is no option without a loser. A breach costs every downstream team 50 points; a full release protects the coast at Mahaica's expense. This is where compensation, early releases before the rain, or Mahaica reducing its floodplain exposure become worth negotiating.</em></p>
 
-  <h3>11.3 Season 7: El Niño drought and the allocation rule</h3>
-  <p>Suppose storage is 160 at the start of the El Niño short dry season (release set to 0). Inflow is 35 × 0.4 × 0.884 = <span class="num">12.4</span>; evaporation is 40 × 1.2 = <span class="num">48</span>. Available above the floor of 90: 160 + 12.4 − 48 − 90 = <strong class="num">34.4</strong> against demand of 95.</p>
+  <h3>11.3 Season 5: El Niño drought and the allocation rule</h3>
+  <p>Suppose storage is 150 at the start of the El Niño long dry season, with the spring rice crop at its thirstiest (release 0). Inflow is 40 × 0.4 × 0.863 × 0.953 = <span class="num">13.2</span>; evaporation is 35 × 1.2 = <span class="num">42</span>. Available above the floor of 90: 150 + 13.2 − 42 − 90 = <strong class="num">31.2</strong> against demand of 95.</p>
   <div class="scroll"><table>
     <thead><tr><th>Council rule</th><th class="r">GWI gets</th><th class="r">Rice gets</th><th class="r">Sugar gets</th><th class="r">GWI pts</th><th class="r">Rice pts</th><th class="r">Sugar pts</th></tr></thead>
     <tbody>
-      <tr><td>Proportional</td><td class="r num">5.4</td><td class="r num">21.7</td><td class="r num">7.2</td><td class="r num">10.9</td><td class="r num">−5.7</td><td class="r num">−0.8</td></tr>
-      <tr><td>Drinking water first</td><td class="r num">15.0</td><td class="r num">14.5</td><td class="r num">4.9</td><td class="r num">30.0</td><td class="r num">−23.7</td><td class="r num">−8.5</td></tr>
-      <tr><td>Irrigation first</td><td class="r num">0.0</td><td class="r num">25.8</td><td class="r num">8.6</td><td class="r num">0.0</td><td class="r num">4.5</td><td class="r num">3.5</td></tr>
+      <tr><td>Proportional</td><td class="r num">4.9</td><td class="r num">19.7</td><td class="r num">6.6</td><td class="r num">9.8</td><td class="r num">−10.8</td><td class="r num">−3.0</td></tr>
+      <tr><td>Drinking water first</td><td class="r num">15.0</td><td class="r num">12.1</td><td class="r num">4.0</td><td class="r num">30.0</td><td class="r num">−29.7</td><td class="r num">−11.1</td></tr>
+      <tr><td>Irrigation first</td><td class="r num">0.0</td><td class="r num">23.4</td><td class="r num">7.8</td><td class="r num">0.0</td><td class="r num">−1.6</td><td class="r num">0.9</td></tr>
     </tbody>
   </table></div>
-  <p><em>Lesson: the same water, shared under three rules, produces three different sets of winners. Lowering the Environment reserve would release more water but stress the wetland. Planting less rice before the drought (the forecast said El Niño) was the cheapest way out.</em></p>
+  <p>The operator can also act directly. Under proportional sharing, cutting rice and sugar supply to 50% while keeping GWI at 100% gives GWI 8.5 Mm³ instead of 4.9 (17 points instead of 9.8); rice drops to 17.0 Mm³ and −17.5 points, sugar to 5.7 Mm³ and −5.9 points.</p>
+  <p><em>Lesson: the same water, shared under three rules, produces three different sets of winners, and the operator's supply decisions shift it again. The rice area was fixed back in the short wet season, so farmers cannot cut it now. The decision that mattered was made at sowing, when the outlook already said El Niño. Lowering the Environment reserve would release more water but stress the wetland.</em></p>
 
   <h3>11.4 Season 4: the same downstream decisions, three upstream basins</h3>
-  <p>Downstream teams make identical decisions in all three runs (medium fertilizer, release 40 in season 4). Only the upstream setting differs, held from season 1.</p>
+  <p>Downstream teams make identical decisions in all three runs (releases 20, 120, 20 and 40 in seasons 1–4). Only the upstream setting differs, held from season 1.</p>
   <div class="scroll"><table>
     <thead><tr><th>Upstream</th><th class="r">Inflow</th><th class="r">N load in, t</th><th class="r">Sediment in, t</th><th class="r">N, mg/L</th><th class="r">Sediment, mg/L</th><th class="r">GWI pts</th><th class="r">Mahaica pts</th><th class="r">EPA pts</th></tr></thead>
     <tbody>
-      <tr><td>Pristine forest</td><td class="r num">130.9</td><td class="r num">52</td><td class="r num">1,047</td><td class="r num">0.24</td><td class="r num">2</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
-      <tr><td>Current practice</td><td class="r num">140.0</td><td class="r num">176</td><td class="r num">9,820</td><td class="r num">0.61</td><td class="r num">15</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
-      <tr><td>Expansion</td><td class="r num">154.4</td><td class="r num">512</td><td class="r num">48,935</td><td class="r num">1.45</td><td class="r num" style="color:var(--bad)">64.5</td><td class="r num">16.5</td><td class="r num">15</td><td class="r num">10</td></tr>
+      <tr><td>Pristine forest</td><td class="r num">130.9</td><td class="r num">52</td><td class="r num">1,047</td><td class="r num">0.23</td><td class="r num">1.8</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
+      <tr><td>Current practice</td><td class="r num">140.0</td><td class="r num">176</td><td class="r num">9,820</td><td class="r num">0.59</td><td class="r num">14.3</td><td class="r num">30</td><td class="r num">24</td><td class="r num">45</td></tr>
+      <tr><td>Expansion</td><td class="r num">154.4</td><td class="r num">512</td><td class="r num">48,935</td><td class="r num">1.41</td><td class="r num" style="color:var(--bad)">61.3</td><td class="r num">17.6</td><td class="r num">15</td><td class="r num">10</td></tr>
     </tbody>
   </table></div>
-  <p>Step by step for the expansion case. Start: storage 213.3 Mm³ holding 220.7 t N and 7,899 t sediment. Inflow is 120 × 1.0 × 1.090 × 1.18 = 154.4 (land clearing adds 18%), evaporation 15, so the mixing volume is 352.7 Mm³. Nitrogen in: 0.4 × 154.4 = 61.8 natural plus 9 × 200 × 0.25 = 450 from upstream farms. Equation (15): (220.7 + 61.8 + 450) × 0.7 / 352.7 = <strong class="num">1.45 mg/L</strong> (caution). Sediment in: 1,235 natural + 2,700 from cleared land + 45,000 from large-scale mining; (7,899 + 48,935) × 0.4 / 352.7 = <strong class="num">64.5 mg/L</strong> (poor).</p>
-  <p>Consequences: GWI's treatment cost is 0.25 × (64.5 − 25) + 8 × (1.45 − 1.0) = 13.5, so GWI scores 16.5 instead of 30. The 40 Mm³ release carries poor water into the Mahaica River, harming livestock (−15 × 0.6 = −9). The EPA team loses its clean-water bonus. <em>Lesson: downstream teams did nothing differently, yet three of them lost points. Their only options are to negotiate with, pay, or lobby for regulation of a basin they do not control.</em></p>
+  <p>Step by step for the expansion case. Start: storage 237.6 Mm³ holding 247.3 t N and 8,883 t sediment. Inflow is 120 × 1.0 × 1.090 × 1.18 = 154.4 (land clearing adds 18%), evaporation 15, so the mixing volume is 377.0 Mm³. Nitrogen in: 0.4 × 154.4 = 61.8 natural plus 9 × 200 × 0.25 = 450 from upstream farms. Equation (15): (247.3 + 61.8 + 450) × 0.7 / 377.0 = <strong class="num">1.41 mg/L</strong> (caution). Sediment in: 1,235 natural + 2,700 from cleared land + 45,000 from large-scale mining; (8,883 + 48,935) × 0.4 / 377.0 = <strong class="num">61.3 mg/L</strong> (poor).</p>
+  <p>Consequences: GWI's treatment cost is 0.25 × (61.3 − 25) + 8 × (1.41 − 1.0) = 12.4, so GWI scores 17.6 instead of 30. The 40 Mm³ release carries poor water into the Mahaica River, harming livestock (−15 × 0.6 = −9). The EPA team loses its clean-water bonus and its healthy-estuary bonus, because the extra released nitrogen tips the estuary into caution. <em>Lesson: downstream teams did nothing differently, yet three of them lost points. Their only options are to negotiate with, pay, or lobby for regulation of a basin they do not control.</em></p>
 
   <h3>11.5 Season 2: coastal fertilizer and the estuary</h3>
-  <p>La Niña long wet season, operator release 120, upstream on current practice. Only the coastal farms' fertilizer choice and the EPA rule change:</p>
+  <p>La Niña long wet season, the autumn rice crop being sown, operator release 120. Only the coastal farms' fertilizer choice and the EPA rule change. Farm nitrogen to the estuary at medium fertilizer: rice 15 × 120 × 0.6 × 0.25 = 270, sugar 8 × 60 × 0.25 = 120, plus 60 t carried by the release.</p>
   <div class="scroll"><table>
     <thead><tr><th>Coastal choice</th><th class="r">N to estuary, t</th><th>Estuary</th><th class="r">Rice pts</th><th class="r">Sugar pts</th><th class="r">EPA pts</th></tr></thead>
     <tbody>
-      <tr><td>Medium fertilizer</td><td class="r num">480</td><td style="color:var(--warn)">Caution</td><td class="r num">90</td><td class="r num">40</td><td class="r num">35</td></tr>
-      <tr><td>High fertilizer</td><td class="r num">690</td><td style="color:var(--bad)">Poor</td><td class="r num">101</td><td class="r num">43</td><td class="r num">15</td></tr>
-      <tr><td>High fertilizer + EPA buffer strips</td><td class="r num">501</td><td style="color:var(--warn)">Caution</td><td class="r num">96</td><td class="r num">41</td><td class="r num">35</td></tr>
+      <tr><td>Medium fertilizer</td><td class="r num">450</td><td style="color:var(--warn)">Caution</td><td class="r num">90</td><td class="r num">40</td><td class="r num">35</td></tr>
+      <tr><td>High fertilizer</td><td class="r num">622</td><td style="color:var(--bad)">Poor</td><td class="r num">100.5</td><td class="r num">43.2</td><td class="r num">15</td></tr>
+      <tr><td>High fertilizer + EPA buffer strips</td><td class="r num">453</td><td style="color:var(--warn)">Caution</td><td class="r num">96</td><td class="r num">40.8</td><td class="r num">35</td></tr>
     </tbody>
   </table></div>
-  <p><em>Lesson: high fertilizer earns the farms 14 more points but costs the coast 20. Buffer strips recover most of the environmental damage while leaving the farms better off than at medium. Regulation that is designed well need not be a straight loss for producers.</em></p>
+  <p><em>Lesson: high fertilizer earns the farms about 14 more points but costs the coast 20. Buffer strips recover the environmental damage while leaving the farms better off than at medium. Regulation that is designed well need not be a straight loss for producers. Because the rice decision is locked for two seasons, the same choice affects the estuary again in the short dry season.</em></p>
 
   <h2 id="limits"><span class="n">12</span>Assumptions and limits</h2>
   <div class="callout warn"><p>This is a teaching model. It is deliberately simple so players can follow it. Do not use its numbers for design, operation or planning decisions.</p></div>
@@ -599,6 +608,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <li><strong>Institutions:</strong> What body should make these decisions in reality? What would a basin council for the conservancy need to work?</li>
     <li><strong>Quality:</strong> When did water quality get worse, and was it because of more pollution or less water? How could you tell the difference?</li>
     <li><strong>Upstream:</strong> How did it feel to lose points to a basin you could not influence? What changed once the upstream teams were at the table? Which agencies in Guyana would need to sit on a body that covers both basins?</li>
+    <li><strong>Operator:</strong> When did the operator cut someone's supply? Was it to save water for a forecast drought, and did that drought arrive? Who should be able to overrule the operator?</li>
     <li><strong>Payments:</strong> Did anyone pay the upstream miners to use settling ponds, or the coastal farms to use less fertilizer? Who should pay: the polluter or the beneficiary?</li>
     <li><strong>Transfer:</strong> Where do you see the same pattern in your own work?</li>
   </ul>
@@ -671,13 +681,14 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <li>Barreteau, O., et al. (2003). Our companion modelling approach. <em>Journal of Artificial Societies and Social Simulation</em>, 6(2).</li>
     <li>Yates, D., Sieber, J., Purkey, D. and Huber-Lee, A. (2005). WEAP21 – A demand-, priority-, and preference-driven water planning model. <em>Water International</em>, 30(4), 487–500.</li>
     <li>Kolb, D.A. (1984). <em>Experiential Learning: Experience as the Source of Learning and Development.</em> Prentice Hall.</li>
+    <li>Guyana Rice Development Board (n.d.). <em>Agronomy of rice.</em> grdb.gy/agronomy-of-rice. See also GRDB sowing-period advisories as reported in the Guyana Chronicle (5 January 2021) and Stabroek News (6 May 2024), and USDA FAS (2021), <em>Guyana Rice Commodity Intelligence Report.</em></li>
     <li>Carpenter, S.R., Caraco, N.F., Correll, D.L., Howarth, R.W., Sharpley, A.N. and Smith, V.H. (1998). Nonpoint pollution of surface waters with phosphorus and nitrogen. <em>Ecological Applications</em>, 8(3), 559–568.</li>
     <li>Chapra, S.C. (1997). <em>Surface Water-Quality Modeling.</em> McGraw-Hill.</li>
     <li>Mayer, I.S. (2009). The gaming of policy and the politics of gaming: A review. <em>Simulation &amp; Gaming</em>, 40(6), 825–862.</li>
   </ol>
 
   <footer>
-    Conservancy Council · Game documentation v2.0 · Faculty of Earth and Environmental Sciences, University of Guyana. Teaching material with illustrative data. <a href="index.html">Back to the game</a>.
+    Conservancy Council · Game documentation v2.2 · Faculty of Earth and Environmental Sciences, University of Guyana. Teaching material with illustrative data. <a href="index.html">Back to the game</a>.
   </footer>
 </main>
 </div>

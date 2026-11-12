@@ -268,6 +268,10 @@ textarea{width:100%;min-height:140px;font:12px var(--mono);background:var(--bg);
         <li>Click <strong>Run this season</strong>. Read out the water balance and the events. Ask who gained and who paid.</li>
         <li>Play 8 seasons (two years). The default climate script has a La Niña flood season early and El Niño droughts later, so teams face both too much and too little water.</li>
       </ol>
+      <h3>Operator supply</h3>
+      <p>The conservancy operator decides how much water each user receives, as a percentage of what they need. Water held back stays in storage for later seasons. If there is not enough water for what the operator has allocated, the council's allocation rule shares the shortfall. Users who get less than they need lose yield or supply reliability, so every cut needs explaining at the table.</p>
+      <h3>Rice crop calendar</h3>
+      <p>Rice follows Guyana's two-crop calendar. The spring crop is sown in the short wet season (Dec–Jan) and harvested in the long dry season; the autumn crop is sown in the long wet season (May–Aug) and harvested in the short dry season. Rice farmers can only change area and fertilizer in a sowing window: what they plant stays in the field for two seasons, so they must commit on the strength of the rainfall outlook.</p>
       <h3>Water quality and the upstream basin</h3>
       <p>Coastal rice and sugar choose a fertilizer rate. Their runoff drains to the estuary through canals and kokers, not into the conservancy. The conservancy's own quality depends on the upstream catchment: farm fertilizer adds nitrogen, mining and cleared land add sediment. Polluted water raises GWI's treatment costs and harms Mahaica livestock when it is released, and nitrogen reaching the estuary threatens marine life.</p>
       <p><strong>Suggested run:</strong> play seasons 1–4 with upstream fixed at <em>current practice</em>, switch to <em>expansion</em> for seasons 5–6 without warning, then hand the upstream basin to two teams for seasons 7–8 and let everyone negotiate across the basin boundary.</p>
@@ -339,26 +343,28 @@ const DEFAULTS = {
   exportWet: 0.25, exportDry: 0.08,  // fraction of applied N washed off the land
   nGood: 1.0, nPoor: 2.0, tssGood: 25, tssPoor: 60,
   livestockLoss: 15,
-  coastGood: 450, coastPoor: 650,    // tonnes N reaching the estuary per season
+  coastGood: 425, coastPoor: 600,    // tonnes N reaching the estuary per season
   bufferCut: 0.3, bufferCost: 0.3,
   gwiTreatTSS: 0.25, gwiTreatN: 8, gwiTreatCap: 20,
   // upstream basin
   upRev: 8, upCost: 3, mineEarn: [0, 25, 50, 80], mineSed: [0, 5000, 14000, 30000],
   pondRemoval: 0.7, pondCost: 12, upWetRunoff: 0.01, upWetMine: 0.03, upDryArea: 0.008, upDryMine: 0.015,
   seasons: [
-    { name: 'Long dry',  months: 'Feb–Apr', inflow: 40,  evap: 35, cropFactor: 1.0, wet: false },
-    { name: 'Long wet',  months: 'May–Aug', inflow: 220, evap: 25, cropFactor: 0.5, wet: true },
-    { name: 'Short dry', months: 'Sep–Nov', inflow: 35,  evap: 40, cropFactor: 1.0, wet: false },
-    { name: 'Short wet', months: 'Dec–Jan', inflow: 120, evap: 15, cropFactor: 0.6, wet: true }
+    // cropFactor: sugar; riceFactor/riceN/riceStage: rice crop calendar (GRDB: spring crop sown mid-Nov–Dec, harvested Mar–Apr;
+    // autumn crop sown mid-May–Jun, harvested Sep–Oct)
+    { name: 'Long dry',  months: 'Feb–Apr', inflow: 40,  evap: 35, cropFactor: 1.0, wet: false, riceCrop: 'Spring crop', riceStage: 'grow', riceFactor: 1.0, riceN: 0.4 },
+    { name: 'Long wet',  months: 'May–Aug', inflow: 220, evap: 25, cropFactor: 0.5, wet: true,  riceCrop: 'Autumn crop', riceStage: 'sow',  riceFactor: 0.6, riceN: 0.6 },
+    { name: 'Short dry', months: 'Sep–Nov', inflow: 35,  evap: 40, cropFactor: 1.0, wet: false, riceCrop: 'Autumn crop', riceStage: 'grow', riceFactor: 0.5, riceN: 0.4 },
+    { name: 'Short wet', months: 'Dec–Jan', inflow: 120, evap: 15, cropFactor: 0.6, wet: true,  riceCrop: 'Spring crop', riceStage: 'sow',  riceFactor: 0.7, riceN: 0.6 }
   ],
   script: ['Normal', 'La Niña', 'Normal', 'Normal', 'El Niño', 'Normal', 'El Niño', 'La Niña']
 };
 const CLIMS = ['El Niño', 'Normal', 'La Niña'];
-// fertilizer: N applied (kg/ha/season), yield multiplier, extra cost per k ha
+// fertilizer: N applied — rice kg/ha per crop (split across its two seasons), sugar and upstream kg/ha per season; yield multiplier; extra cost per k ha
 const FERT = {
-  low:  { rice: 40,  sugar: 30, up: 60,   yield: 0.85, cost: -0.5 },
-  med:  { rice: 80,  sugar: 60, up: 120, yield: 1.00, cost: 0 },
-  high: { rice: 120, sugar: 90, up: 200, yield: 1.15, cost: 0.8 }
+  low:  { rice: 70,  sugar: 30, up: 60,   yield: 0.85, cost: -0.5 },
+  med:  { rice: 120, sugar: 60, up: 120, yield: 1.00, cost: 0 },
+  high: { rice: 170, sugar: 90, up: 200, yield: 1.15, cost: 0.8 }
 };
 const UP_SCENARIOS = {
   pristine:  { label: 'Pristine forest',              areaU: 0, fertU: 'low',  mine: 0, ponds: false },
@@ -418,7 +424,7 @@ function seasonDemands(P, r, dec) {
   const season = P.seasons[r % 4];
   return {
     gwi: dec.gwi.request,
-    rice: dec.rice.area * P.riceRate * season.cropFactor,
+    rice: dec.rice.area * P.riceRate * (season.riceFactor ?? season.cropFactor),
     sugar: dec.sugar.area * P.sugarRate * season.cropFactor
   };
 }
@@ -441,7 +447,11 @@ function simulateSeason(P, st, r, dec, world, leakSavings) {
   const avail = Math.max(0, S0 + inflow - evap - floor);
   const gwiNeed = Math.max(0, P.gwiDemand - leakSavings);
   const dem = seasonDemands(P, r, dec);
-  const del = allocate(dem, avail, dec.rule);
+  // the operator decides how much of each user's demand to supply (% of demand); the council rule shares any shortfall
+  const sup = Object.assign({ gwi: 100, rice: 100, sugar: 100 }, dec.op.supply || {});
+  const target = { gwi: dem.gwi * sup.gwi / 100, rice: dem.rice * sup.rice / 100, sugar: dem.sugar * sup.sugar / 100 };
+  const heldBack = (dem.gwi - target.gwi) + (dem.rice - target.rice) + (dem.sugar - target.sugar);
+  const del = allocate(target, avail, dec.rule);
   const delivered = del.gwi + del.rice + del.sugar;
   const vMix = S0 + inflow - evap;
   const afterW = vMix - delivered;
@@ -471,7 +481,7 @@ function simulateSeason(P, st, r, dec, world, leakSavings) {
   const fertR = capOn && dec.rice.fert === 'high' ? 'med' : dec.rice.fert;
   const fertS = capOn && dec.sugar.fert === 'high' ? 'med' : dec.sugar.fert;
   const cut = buffer ? 1 - P.bufferCut : 1;
-  const coastFarmN = (dec.rice.area * FERT[fertR].rice + dec.sugar.area * FERT[fertS].sugar) * exportF * cut;
+  const coastFarmN = (dec.rice.area * FERT[fertR].rice * (season.riceN ?? 0.5) + dec.sugar.area * FERT[fertS].sugar) * exportF * cut;
   const coastRelN = (release + overtop) * cN;
   const coastN = coastFarmN + coastRelN;
 
@@ -480,6 +490,8 @@ function simulateSeason(P, st, r, dec, world, leakSavings) {
   const gwiFrac = gwiNeed > 0 ? Math.min(1, del.gwi / gwiNeed) : 1;
   const totalDem = dem.gwi + dem.rice + dem.sugar;
   const pctMet = totalDem > 0 ? delivered / totalDem : 1;
+  const totalTarget = target.gwi + target.rice + target.sugar;
+  const shortfall = Math.max(0, totalTarget - delivered);
   const excess = Math.max(0, release - P.mahaicaThreshold);
   const act = dec.mahaica.activity / 100;
   const damage = excess * P.floodDamage * act;
@@ -507,7 +519,9 @@ function simulateSeason(P, st, r, dec, world, leakSavings) {
   if (world.forecast[r] !== clim) events.push({ lvl: 'warn', t: `Forecast missed: ${world.forecast[r]} was forecast, ${clim} arrived.` });
   if (breach) events.push({ lvl: 'bad', t: `Dam overtopped by ${overtop.toFixed(0)} Mm³. Flooding on the coast; downstream teams lose 50 points each.` });
   else if (S1 > P.sSafe) events.push({ lvl: 'warn', t: `Conservancy above the safe level (${S1.toFixed(0)} Mm³). The dam is under strain.` });
-  if (pctMet < 0.999) events.push({ lvl: pctMet < 0.7 ? 'bad' : 'warn', t: `Shortage: users received ${(pctMet * 100).toFixed(0)}% of what they requested.` });
+  if (heldBack > 0.05) events.push({ lvl: 'info', t: `Operator held back ${heldBack.toFixed(1)} Mm³ of requested supply (GWI ${sup.gwi}%, rice ${sup.rice}%, sugar ${sup.sugar}%). It stays in the conservancy.` });
+  if (shortfall > 0.05) events.push({ lvl: 'bad', t: `Not enough water for what the operator allocated: ${shortfall.toFixed(1)} Mm³ short, shared by the council rule.` });
+  if (pctMet < 0.999) events.push({ lvl: pctMet < 0.7 ? 'bad' : 'warn', t: `Users received ${(pctMet * 100).toFixed(0)}% of what they needed.` });
   if (gwiFrac < 0.999) events.push({ lvl: 'bad', t: `Georgetown supply short: GWI met ${(gwiFrac * 100).toFixed(0)}% of its need.` });
   if (excess > 0) events.push({ lvl: damage > 20 ? 'bad' : 'warn', t: `Sluice release of ${release.toFixed(0)} Mm³ exceeded the Mahaica limit by ${excess.toFixed(0)} Mm³. Flood damage: ${damage.toFixed(0)} points.` });
   if (release < dec.op.release - 0.5) events.push({ lvl: 'info', t: `Operator asked for ${dec.op.release} Mm³ but only ${release.toFixed(0)} Mm³ could be released.` });
@@ -524,8 +538,8 @@ function simulateSeason(P, st, r, dec, world, leakSavings) {
   if (!events.length) events.push({ lvl: 'good', t: 'All demands met, dam safe, water clean, coast healthy. A good season.' });
 
   return {
-    r, season: season.name, months: season.months, wet: season.wet, clim, forecast: world.forecast[r],
-    S0, inflow, upMult, evap, floor, avail, dem, del, delivered, gwiNeed, gwiFrac,
+    r, season: season.name, months: season.months, wet: season.wet, riceCrop: season.riceCrop, riceStage: season.riceStage, clim, forecast: world.forecast[r],
+    S0, inflow, upMult, evap, floor, avail, dem, target, sup, heldBack, shortfall, del, delivered, gwiNeed, gwiFrac,
     releaseReq: dec.op.release, release, overtop, breach, S1, pctMet, excess, damage,
     cN0: st.MN / S0, cT0: st.MT / S0, cN, cT, MN1, MT1,
     loadN_bg, loadN_up, loadT_bg, loadT_mine, loadT_land, coastFarmN, coastRelN, coastN,
@@ -543,7 +557,7 @@ const TEAMS = [
   { k:'gwi',     name:'GWI',                  role:'Georgetown drinking water supply', c:'--t-gwi' },
   { k:'rice',    name:'Rice farmers',         role:'Irrigation of coastal rice lands', c:'--t-rice' },
   { k:'sugar',   name:'Sugar estate',         role:'Irrigation of cane fields', c:'--t-sugar' },
-  { k:'op',      name:'Conservancy operator', role:'Dam safety and relief sluices', c:'--t-op' },
+  { k:'op',      name:'Conservancy operator', role:'Water allocation, dam safety and relief sluices', c:'--t-op' },
   { k:'mahaica', name:'Mahaica communities',  role:'Villages, farms and livestock downstream of the sluices', c:'--t-mahaica' },
   { k:'env',     name:'Environment (EPA)',    role:'Wetland, water quality and coastal ecosystems', c:'--t-env' },
   { k:'upfarm',  name:'Upstream farmers',     role:'Farms in the conservancy catchment', c:'--t-upfarm', up:true },
@@ -552,7 +566,7 @@ const TEAMS = [
 const FERT_LABEL = { low:'Low', med:'Medium', high:'High' };
 const clone = o => JSON.parse(JSON.stringify(o));
 let P = clone(DEFAULTS), world = makeWorld(P), history = [], dec = defaultDec();
-function defaultDec(){ return { rule:'proportional', gwi:{request:15, leak:false}, rice:{area:15, fert:'med'}, sugar:{area:8, fert:'med'}, op:{release:20}, mahaica:{activity:60}, env:{reserve:90, rule:'none'}, up:{mode:'current', areaU:4, fertU:'med', mine:1, ponds:false} }; }
+function defaultDec(){ return { rule:'proportional', gwi:{request:15, leak:false}, rice:{area:15, fert:'med'}, sugar:{area:8, fert:'med'}, op:{release:20, supply:{gwi:100, rice:100, sugar:100}}, mahaica:{activity:60}, env:{reserve:90, rule:'none'}, up:{mode:'current', areaU:4, fertU:'med', mine:1, ponds:false} }; }
 const $ = id => document.getElementById(id);
 const f0 = x => (Math.round(x)).toLocaleString('en-US');
 const r = () => history.length;
@@ -583,9 +597,14 @@ function buildCards(){
   const b = {};
   b.gwi = slider('gwi-request','Abstraction request',0,30,1,dec.gwi.request,'Mm³') +
     `<label class="check" for="gwi-leak"><input type="checkbox" id="gwi-leak"> <span>Invest in leak repair this season (costs ${P.leakCost} points; need falls by ${P.leakSave} Mm³ for the rest of the game)</span></label>`;
-  b.rice = slider('rice-area','Area planted',0,25,1,dec.rice.area,'k ha') + fertSelect('rice-fert');
+  b.rice = `<div class="hint" id="rice-lock" style="border-left:3px solid var(--t-rice);padding-left:8px"></div>` + slider('rice-area','Area planted',0,25,1,dec.rice.area,'k ha') + fertSelect('rice-fert');
   b.sugar = slider('sugar-area','Cane area irrigated',0,15,1,dec.sugar.area,'k ha') + fertSelect('sugar-fert');
-  b.op = slider('op-release','Release through relief sluices',0,P.sluiceCap,5,dec.op.release,'Mm³') +
+  b.op = `<div class="hint" style="font-weight:600;color:var(--ink)">Water supplied to each user, % of what they need</div>` +
+    slider('op-sgwi','Supply to GWI',0,100,5,dec.op.supply.gwi,'%') +
+    slider('op-srice','Supply to rice farms',0,100,5,dec.op.supply.rice,'%') +
+    slider('op-ssugar','Supply to sugar estate',0,100,5,dec.op.supply.sugar,'%') +
+    `<div class="hint">Water held back stays in the conservancy for later seasons.</div>` +
+    slider('op-release','Release through relief sluices',0,P.sluiceCap,5,dec.op.release,'Mm³') +
     `<div class="hint">Mahaica River safe limit: ${P.mahaicaThreshold} Mm³ per season. Dam is unsafe above ${P.sSafe} Mm³ and overtops at ${P.sMax}. Released water carries the conservancy's pollution downstream.</div>`;
   b.mahaica = slider('mahaica-activity','Farming and livestock in the floodplain',0,100,10,dec.mahaica.activity,'%') +
     `<div class="hint">More activity earns more, and loses more if the operator floods the river or releases polluted water.</div>`;
@@ -598,6 +617,9 @@ function buildCards(){
   bind('rice-area', v => dec.rice.area = v, 'k ha');
   bind('sugar-area', v => dec.sugar.area = v, 'k ha');
   bind('op-release', v => dec.op.release = v, 'Mm³');
+  bind('op-sgwi', v => dec.op.supply.gwi = v, '%');
+  bind('op-srice', v => dec.op.supply.rice = v, '%');
+  bind('op-ssugar', v => dec.op.supply.sugar = v, '%');
   bind('mahaica-activity', v => dec.mahaica.activity = v, '%');
   bind('env-reserve', v => dec.env.reserve = v, 'Mm³');
   $('gwi-leak').addEventListener('change', e => { dec.gwi.leak = e.target.checked; updatePreviews(); });
@@ -633,7 +655,9 @@ function buildUpstream(){
 function syncCards(){
   const set = (id, v, unit) => { $(id).value = v; $(id+'-o').textContent = v + ' ' + unit; };
   set('gwi-request', dec.gwi.request, 'Mm³'); set('rice-area', dec.rice.area, 'k ha'); set('sugar-area', dec.sugar.area, 'k ha');
-  set('op-release', dec.op.release, 'Mm³'); set('mahaica-activity', dec.mahaica.activity, '%'); set('env-reserve', dec.env.reserve, 'Mm³');
+  set('op-release', dec.op.release, 'Mm³');
+  if (!dec.op.supply) dec.op.supply = {gwi:100, rice:100, sugar:100};
+  set('op-sgwi', dec.op.supply.gwi, '%'); set('op-srice', dec.op.supply.rice, '%'); set('op-ssugar', dec.op.supply.sugar, '%'); set('mahaica-activity', dec.mahaica.activity, '%'); set('env-reserve', dec.env.reserve, 'Mm³');
   $('gwi-leak').checked = dec.gwi.leak; $('rule').value = dec.rule;
   $('rice-fert').value = dec.rice.fert; $('sugar-fert').value = dec.sugar.fert; $('env-rule').value = dec.env.rule;
   $('upmode').value = dec.up.mode; buildUpstream();
@@ -647,9 +671,10 @@ function updatePreviews(){
   const cut = dec.env.rule === 'buffer' ? 1 - P.bufferCut : 1;
   const fR = dec.env.rule === 'cap' && dec.rice.fert === 'high' ? 'med' : dec.rice.fert;
   const fS = dec.env.rule === 'cap' && dec.sugar.fert === 'high' ? 'med' : dec.sugar.fert;
-  $('pv-rice').textContent = `Water demand ${d.rice.toFixed(1)} Mm³ · about ${f0(dec.rice.area*FERT[fR].rice*exp*cut)} t N to the coast`;
+  $('pv-rice').textContent = `Water demand ${d.rice.toFixed(1)} Mm³ · about ${f0(dec.rice.area*FERT[fR].rice*(season.riceN ?? 0.5)*exp*cut)} t N to the coast`;
   $('pv-sugar').textContent = `Water demand ${d.sugar.toFixed(1)} Mm³ · about ${f0(dec.sugar.area*FERT[fS].sugar*exp*cut)} t N to the coast`;
-  $('pv-op').textContent = `Users are requesting ${(d.gwi + d.rice + d.sugar).toFixed(1)} Mm³ in total`;
+  const sp = dec.op.supply, give = { gwi: d.gwi*sp.gwi/100, rice: d.rice*sp.rice/100, sugar: d.sugar*sp.sugar/100 };
+  $('pv-op').textContent = `Needed ${(d.gwi + d.rice + d.sugar).toFixed(1)} Mm³; allocating ${(give.gwi+give.rice+give.sugar).toFixed(1)} (GWI ${give.gwi.toFixed(1)}, rice ${give.rice.toFixed(1)}, sugar ${give.sugar.toFixed(1)})`;
   const ex = Math.max(0, dec.op.release - P.mahaicaThreshold);
   $('pv-mahaica').textContent = ex > 0 ? `At the planned release: ${(ex*P.floodDamage*dec.mahaica.activity/100).toFixed(0)} points of flood damage` : `Planned release is within the river's safe limit`;
   const floor = Math.max(P.sDead, dec.env.reserve);
@@ -660,7 +685,17 @@ function updatePreviews(){
   TEAMS.forEach(tm => { const el = $('tot-'+tm.k); if (el) el.textContent = history.length ? `${f0(t[tm.k])} pts` : ''; });
   document.querySelectorAll('#teams input, #teams select, #upbody input, #upbody select').forEach(i => i.disabled = done);
   $('rule').disabled = done; $('upmode').disabled = done;
+  // rice crop calendar: area and fertilizer can only change in a sowing window (or in season 1)
+  const locked = !done && riceLocked();
+  $('rice-area').disabled = done || locked; $('rice-fert').disabled = done || locked;
+  const next = P.seasons[(rr+1)%4], nextSow = season.riceStage === 'grow' ? next : P.seasons[(rr+2)%4];
+  $('rice-lock').innerHTML = done ? '' : locked
+    ? `<strong>${season.riceCrop} in the field.</strong> Area and fertilizer are fixed until the next sowing window: ${nextSow.name} (${nextSow.months}).`
+    : r() === 0 && season.riceStage === 'grow'
+      ? `<strong>${season.riceCrop} already sown</strong> last Dec–Jan. Set the area that was planted; it is fixed from next season until the autumn sowing window.`
+      : `<strong>Sowing window: ${season.riceCrop.toLowerCase()}.</strong> What you plant now stays in the field for two seasons.`;
 }
+function riceLocked(){ const rr = r(); return rr > 0 && rr < P.rounds && P.seasons[rr%4].riceStage === 'grow'; }
 
 /* ---------- status strip ---------- */
 function gaugeSVG(s){
@@ -684,7 +719,7 @@ function renderStatus(){
   } else {
     const rr = r(), s = P.seasons[rr%4], yr = Math.floor(rr/4)+1, fc = world.forecast[rr];
     $('seasonTitle').textContent = `Season ${rr+1} of ${P.rounds}: ${s.name} (${s.months}), year ${yr}`;
-    $('seasonMeta').innerHTML = `<span>Rainfall outlook: <span class="chip ${climClass(fc)}">${climLabel(fc)}</span></span><span>Typical inflow ${s.inflow} Mm³, evaporation ${s.evap} Mm³</span>`;
+    $('seasonMeta').innerHTML = `<span>Rainfall outlook: <span class="chip ${climClass(fc)}">${climLabel(fc)}</span></span><span>Rice: <span class="chip" style="color:var(--t-rice)">${s.riceCrop}, ${s.riceStage === 'sow' ? 'sowing window' : 'growing and harvest'}</span></span><span>Typical inflow ${s.inflow} Mm³, evaporation ${s.evap} Mm³</span>`;
   }
   $('runBtn').disabled = done; $('undoBtn').disabled = !history.length;
 }
@@ -719,7 +754,7 @@ function renderResults(){
   <p class="hint" style="margin:10px 0 0">Total requested ${f0(h.dem.gwi+h.dem.rice+h.dem.sugar)} Mm³; available above the protected floor of ${f0(h.floor)}: ${f0(h.avail)} Mm³. Deficit: <strong class="num ${h.pctMet<0.999?'neg':''}">${f0(h.dem.gwi+h.dem.rice+h.dem.sugar-h.delivered)} Mm³</strong>.</p>`;
 
   const t = totals();
-  const decTxt = { gwi:`Requested ${h.dec.gwi.request} Mm³${h.dec.gwi.leak?' + leak repair':''}`, rice:`${h.dec.rice.area}k ha · ${FERT_LABEL[h.fertR].toLowerCase()} fertilizer`, sugar:`${h.dec.sugar.area}k ha · ${FERT_LABEL[h.fertS].toLowerCase()} fertilizer`, op:`Release ${h.dec.op.release} Mm³`, mahaica:`${h.dec.mahaica.activity}% floodplain use`, env:`Reserve ${h.dec.env.reserve} Mm³ · ${h.dec.env.rule==='buffer'?'buffer strips':h.dec.env.rule==='cap'?'fertilizer cap':'no farm rule'}`,
+  const decTxt = { gwi:`Requested ${h.dec.gwi.request} Mm³${h.dec.gwi.leak?' + leak repair':''}`, rice:`${h.dec.rice.area}k ha · ${FERT_LABEL[h.fertR].toLowerCase()} fertilizer`, sugar:`${h.dec.sugar.area}k ha · ${FERT_LABEL[h.fertS].toLowerCase()} fertilizer`, op:`Supply ${h.sup.gwi}/${h.sup.rice}/${h.sup.sugar}% · release ${h.dec.op.release} Mm³`, mahaica:`${h.dec.mahaica.activity}% floodplain use`, env:`Reserve ${h.dec.env.reserve} Mm³ · ${h.dec.env.rule==='buffer'?'buffer strips':h.dec.env.rule==='cap'?'fertilizer cap':'no farm rule'}`,
     upfarm:`${h.up.areaU}k ha · ${FERT_LABEL[h.up.fertU].toLowerCase()} fertilizer`, upmine:`${MINE_LABELS[h.up.mine]}${h.up.ponds?' + ponds':''}` };
   const dm = { gwi:[h.gwiNeed, h.del.gwi], rice:[h.dem.rice, h.del.rice], sugar:[h.dem.sugar, h.del.sugar] };
   const rows = TEAMS.filter(tm => !tm.up || h.up.played).map(tm => {
@@ -808,8 +843,8 @@ function renderLog(){
   $('log').innerHTML = history.slice().reverse().flatMap(h => h.events.map(e => `<li class="${e.lvl}"><b>S${h.r+1}</b>${e.t}</li>`)).join('');
 }
 function renderCSV(){
-  const head = ['season','name','forecast','climate','rule','upstream','up_area_kha','up_fert','mining','ponds','start','inflow','evap','gwi_request','gwi_need','gwi_got','rice_kha','rice_fert','rice_demand','rice_got','sugar_kha','sugar_fert','sugar_demand','sugar_got','release_requested','release','overtop','end','deficit','N_mgL','TSS_mgL','N_load_up_t','TSS_load_mine_t','coast_N_t','mahaica_damage','gwi_treatment','pts_gwi','pts_rice','pts_sugar','pts_operator','pts_mahaica','pts_env','pts_upfarm','pts_upmine'];
-  const rows = history.map(h => [h.r+1, h.season, h.forecast, h.clim, h.dec.rule, h.dec.up.mode, h.up.areaU, h.up.fertU, MINE_LABELS[h.up.mine], h.up.ponds?'yes':'no', h.S0, h.inflow, h.evap, h.dec.gwi.request, h.gwiNeed, h.del.gwi, h.dec.rice.area, h.fertR, h.dem.rice, h.del.rice, h.dec.sugar.area, h.fertS, h.dem.sugar, h.del.sugar, h.releaseReq, h.release, h.overtop, h.S1, h.dem.gwi+h.dem.rice+h.dem.sugar-h.delivered, h.cN, h.cT, h.loadN_up, h.loadT_mine, h.coastN, h.damage, h.treat, h.pts.gwi, h.pts.rice, h.pts.sugar, h.pts.op, h.pts.mahaica, h.pts.env, h.pts.upfarm, h.pts.upmine].map(v => typeof v==='number' ? Math.round(v*100)/100 : v).join(','));
+  const head = ['season','name','forecast','climate','rule','upstream','up_area_kha','up_fert','mining','ponds','start','inflow','evap','supply_gwi_pct','supply_rice_pct','supply_sugar_pct','held_back','gwi_request','gwi_need','gwi_got','rice_kha','rice_fert','rice_demand','rice_got','sugar_kha','sugar_fert','sugar_demand','sugar_got','release_requested','release','overtop','end','deficit','N_mgL','TSS_mgL','N_load_up_t','TSS_load_mine_t','coast_N_t','mahaica_damage','gwi_treatment','pts_gwi','pts_rice','pts_sugar','pts_operator','pts_mahaica','pts_env','pts_upfarm','pts_upmine'];
+  const rows = history.map(h => [h.r+1, h.season, h.forecast, h.clim, h.dec.rule, h.dec.up.mode, h.up.areaU, h.up.fertU, MINE_LABELS[h.up.mine], h.up.ponds?'yes':'no', h.S0, h.inflow, h.evap, h.sup.gwi, h.sup.rice, h.sup.sugar, h.heldBack, h.dec.gwi.request, h.gwiNeed, h.del.gwi, h.dec.rice.area, h.fertR, h.dem.rice, h.del.rice, h.dec.sugar.area, h.fertS, h.dem.sugar, h.del.sugar, h.releaseReq, h.release, h.overtop, h.S1, h.dem.gwi+h.dem.rice+h.dem.sugar-h.delivered, h.cN, h.cT, h.loadN_up, h.loadT_mine, h.coastN, h.damage, h.treat, h.pts.gwi, h.pts.rice, h.pts.sugar, h.pts.op, h.pts.mahaica, h.pts.env, h.pts.upfarm, h.pts.upmine].map(v => typeof v==='number' ? Math.round(v*100)/100 : v).join(','));
   $('csv').value = [head.join(','), ...rows].join('\n');
 }
 function renderAll(){ renderStatus(); updatePreviews(); renderResults(); renderChart(); renderScores(); renderLog(); renderCSV(); }
@@ -832,8 +867,8 @@ function buildSettings(){
   $('settings').innerHTML = FIELDS.map(([k,l]) => `<label for="set-${k}">${l}<input type="number" step="any" id="set-${k}" value="${P[k]}"></label>`).join('') +
     `<label for="set-mode">Climate<select id="set-mode"><option value="script">Use the script below</option><option value="random">Random each season</option></select></label>`;
   $('set-mode').value = P.climateMode;
-  $('seasonTable').innerHTML = `<thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Crop water factor</th></tr></thead><tbody>` +
-    P.seasons.map((s,i) => `<tr><td>${s.name}</td><td>${s.months}</td>${['inflow','evap','cropFactor'].map(k => `<td class="r"><input type="number" step="any" id="ss-${i}-${k}" value="${s[k]}" aria-label="${s.name} ${k}" style="width:80px"></td>`).join('')}</tr>`).join('') + `</tbody>`;
+  $('seasonTable').innerHTML = `<thead><tr><th>Season</th><th>Months</th><th class="r">Base inflow</th><th class="r">Evaporation</th><th class="r">Sugar water factor</th><th class="r">Rice water factor</th></tr></thead><tbody>` +
+    P.seasons.map((s,i) => `<tr><td>${s.name}</td><td>${s.months}</td>${['inflow','evap','cropFactor','riceFactor'].map(k => `<td class="r"><input type="number" step="any" id="ss-${i}-${k}" value="${s[k]}" aria-label="${s.name} ${k}" style="width:80px"></td>`).join('')}</tr>`).join('') + `</tbody>`;
   const n = Math.max(P.rounds, P.script.length);
   $('scriptBox').innerHTML = Array.from({length:n}, (_,i) => `<label for="sc-${i}">Season ${i+1} (${P.seasons[i%4].name})<select id="sc-${i}">${CLIMS.map(c=>`<option ${P.script[i]===c?'selected':''}>${c}</option>`).join('')}</select></label>`).join('');
 }
@@ -843,7 +878,7 @@ $('applyBtn').addEventListener('click', () => {
   np.rounds = Math.max(1, Math.min(24, Math.round(np.rounds)));
   if (!(np.sDead < np.healthy && np.healthy < np.sSafe && np.sSafe < np.sMax)) { $('applyMsg').textContent = 'Levels must rise in order: dead storage < wetland health < safe limit < overtops.'; return; }
   np.climateMode = $('set-mode').value;
-  np.seasons.forEach((s,i) => ['inflow','evap','cropFactor'].forEach(k => s[k] = Number($(`ss-${i}-${k}`).value) || 0));
+  np.seasons.forEach((s,i) => ['inflow','evap','cropFactor','riceFactor'].forEach(k => s[k] = Number($(`ss-${i}-${k}`).value) || 0));
   const n = Math.max(P.rounds, P.script.length); np.script = Array.from({length:n}, (_,i) => $('sc-'+i).value);
   while (np.script.length < np.rounds) np.script.push('Normal');
   P = np; restart(); $('applyMsg').textContent = 'Settings applied. The game has restarted.';
@@ -855,6 +890,7 @@ $('rule').addEventListener('change', e => { dec.rule = e.target.value; });
 $('upmode').addEventListener('change', e => { dec.up.mode = e.target.value; buildUpstream(); renderAll(); });
 $('runBtn').addEventListener('click', () => {
   if (r() >= P.rounds) return;
+  if (riceLocked()) { dec.rice = clone(history[history.length-1].dec.rice); }
   history.push(simulateSeason(P, ST(), r(), clone(dec), world, leakSavings()));
   dec.gwi.leak = false; syncCards(); renderAll();
 });
@@ -875,7 +911,7 @@ function resultsData(){
     levels: { s0:P.s0, sDead:P.sDead, healthy:P.healthy, sSafe:P.sSafe, sMax:P.sMax, n0:P.n0, tss0:P.tss0, nGood:P.nGood, nPoor:P.nPoor, tssGood:P.tssGood, tssPoor:P.tssPoor, coastGood:P.coastGood, coastPoor:P.coastPoor },
     seasons: history.map(h => ({
       r: h.r+1, season: h.season, clim: h.clim, rule: h.dec.rule, up: h.dec.up.mode, upPlayed: h.up.played,
-      riceFert: h.fertR, sugarFert: h.fertS, epa: h.dec.env.rule, release: rnd(h.release,1),
+      riceFert: h.fertR, sugarFert: h.fertS, supply: h.sup, heldBack: rnd(h.heldBack,1), epa: h.dec.env.rule, release: rnd(h.release,1),
       S1: rnd(h.S1,1), dem: rnd(h.dem.gwi+h.dem.rice+h.dem.sugar,1), del: rnd(h.delivered,1), breach: h.breach, flood: h.damage > 0,
       cN: rnd(h.cN), cT: rnd(h.cT,1), coastN: rnd(h.coastN,0), q: h.qStatus, coast: h.coastStatus,
       pts: Object.fromEntries(Object.entries(h.pts).map(([k,v]) => [k, rnd(v,1)]))
