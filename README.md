@@ -5,6 +5,7 @@ An integrated water resources management (IWRM) role-play game for six downstrea
 - **`index.html`** is the game. Open it in any browser. It needs no server or installation.
 - **`docs.html`** is the full documentation: rules, IWRM principles and theory, the water-balance model and every equation, scoring, default parameters, worked examples, limitations, calibration with real data and WEAP, and a facilitation guide.
 - **`compare.html`** is the facilitator's comparison page. Each table downloads its results file (or copies a results code) from the game; the facilitator drops the files or pastes the codes here to rank the tables and compare their charts on the projector. Nothing is uploaded: it all runs on the facilitator's computer.
+- **`mc/`** holds the Monte Carlo scripts behind section 15 of `docs.html` (score ranges, drivers and the strategy test). Run them with Node.js: `node mc/mc.js 20000`, `node mc/policy.js 2000` and `node mc/pct.js 20000` (the percentile tables behind the balanced scores). They use `mc/model.js`, a copy of the game's model; if you change the model in `index.html`, copy it here too.
 - **`assets/`** holds the faculty logo (see below).
 
 ## Playing with several tables

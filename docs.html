@@ -13,7 +13,7 @@
   --bg:#edf2f3; --surface:#ffffff; --ink:#13242c; --muted:#5a6c74; --line:#d2dde1;
   --water:#1b6585; --water-soft:#d5e8f0;
   --good:#2c7a4b; --warn:#a86b12; --bad:#b0352d;
-  --t-gwi:#2b6cb0; --t-rice:#5b8c25; --t-sugar:#b0513a; --t-op:#4b5a6b; --t-mahaica:#12868a; --t-env:#7a5ca8;
+  --t-gwi:#2a78d6; --t-rice:#eb6834; --t-sugar:#1baf7a; --t-op:#eda100; --t-mahaica:#e87ba4; --t-env:#008300; --t-upfarm:#6250d6; --t-upmine:#e34948;
   --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --math:"IBM Plex Serif",Georgia,"Times New Roman",serif;
@@ -24,14 +24,14 @@
   :root:not([data-theme="light"]){
     --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
     --water:#5ab3d3; --water-soft:#1a3946; --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
-    --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0;
+    --t-gwi:#3987e5; --t-rice:#d95926; --t-sugar:#199e70; --t-op:#c98500; --t-mahaica:#d55181; --t-env:#0ca30c; --t-upfarm:#9085e9; --t-upmine:#e66767;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0e191e; --surface:#15232a; --ink:#e2ebee; --muted:#93a6ae; --line:#293c45;
   --water:#5ab3d3; --water-soft:#1a3946; --good:#5cc08a; --warn:#e0a948; --bad:#ef7a6f;
-  --t-gwi:#6aa6e8; --t-rice:#93c45a; --t-sugar:#e08a70; --t-op:#9fb0c2; --t-mahaica:#4cc4c7; --t-env:#b49ae0;
+  --t-gwi:#3987e5; --t-rice:#d95926; --t-sugar:#199e70; --t-op:#c98500; --t-mahaica:#d55181; --t-env:#0ca30c; --t-upfarm:#9085e9; --t-upmine:#e66767;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -93,6 +93,10 @@ figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
 .steps>li{counter-increment:s;position:relative;padding-left:40px;margin-bottom:10px}
 .steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--water);color:var(--surface);font:600 13px/26px var(--mono);text-align:center}
 .refs li{font-size:14.5px}
+.role h4{display:flex;align-items:center;gap:10px}
+.role h4 .tico{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb, var(--c) 15%, transparent)}
+.two-tables{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.two-tables{grid-template-columns:1fr}}
 footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}
 @media (max-width:900px){
   .layout{grid-template-columns:1fr}
@@ -129,15 +133,16 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
       <li><a href="#limits">12. Assumptions and limits</a></li>
       <li><a href="#calibration">13. Real data and WEAP</a></li>
       <li><a href="#facilitation">14. Facilitation and debrief</a></li>
-      <li><a href="#glossary">15. Glossary</a></li>
-      <li><a href="#references">16. References</a></li>
+      <li><a href="#montecarlo">15. Monte Carlo analysis</a></li>
+      <li><a href="#glossary">16. Glossary</a></li>
+      <li><a href="#references">17. References</a></li>
     </ol>
   </nav>
 
 <main>
   <h1>Conservancy Council</h1>
   <p class="lede">A role-play simulation of integrated water resources management (IWRM) for a coastal water conservancy in Guyana. This manual covers the rules, the theory behind the game, and every equation the model uses, for both water quantity and water quality.</p>
-  <div class="meta"><span>Version 2.2 · November 2026</span><span>Faculty of Earth and Environmental Sciences, University of Guyana</span><span>6 teams + 2 optional upstream teams · 8 seasons · about 2 hours</span></div>
+  <div class="meta"><span>Version 2.5 · November 2026</span><span>Faculty of Earth and Environmental Sciences, University of Guyana</span><span>6 teams + 2 optional upstream teams · 8 seasons · about 2 hours</span></div>
 
   <h2 id="overview"><span class="n">01</span>Overview</h2>
   <p>Six stakeholder teams share one water body: a coastal conservancy that stores rainfall runoff from its catchment behind an earthen dam. The conservancy supplies Georgetown's drinking water and irrigation for rice and sugar. In wet seasons it threatens the dam, and the operator must release water through relief sluices into the Mahaica River, where downstream villages farm the floodplain.</p>
@@ -300,6 +305,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <li>Check that Settings show the climate script and parameters you want. Restarting with the same seed reproduces the same weather.</li>
   </ul>
   <h3>6.2 Each season</h3>
+  <p>The game screen has four tabs that follow the season: <strong>Decide</strong> (the outlook and every team's decisions), <strong>Results</strong> (opens by itself after each run: the main events, where the water went, who got what and water quality), <strong>Game so far</strong> (scoreboard, trends over the game and the full event log) and <strong>Details</strong> (tables, export, settings and this guide, for the facilitator). Keep the projector on Decide while teams negotiate and on Results while you report.</p>
   <ol class="steps">
     <li><strong>Outlook.</strong> The facilitator reads out the season, its typical inflow and evaporation, and the rainfall outlook.</li>
     <li><strong>Negotiation (5–8 minutes).</strong> Teams talk freely. They may make promises, threats, deals and side payments, but promises are not enforced by the model.</li>
@@ -312,7 +318,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <ul>
     <li>Decisions carry over to the next season unless a team changes them. Leak repair must be chosen again each season it is wanted.</li>
     <li>Rice farmers may change their area and fertilizer only in a sowing window: the short wet season (spring crop) and the long wet season (autumn crop), and in season 1 to set the crop already in the ground. In the other seasons the game locks their controls, because the crop is already planted.</li>
-    <li><em>Undo last season</em> exists to fix data-entry mistakes, not to replay bad luck.</li>
+    <li>There is no undo: once a season runs, its decisions stand. Check every slider before clicking <em>Run this season</em>.</li>
     <li>Optional compensation rule: teams may agree to transfer points (for example, GWI pays Mahaica for accepting a release). The facilitator records transfers by hand and adjusts final scores.</li>
     <li>The game ends after the last season (default 8). The basin total and each team's score feed into the debrief. There is no single winner; ask whether the basin as a whole did well.</li>
   </ul>
@@ -436,6 +442,22 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <li><strong>Upstream teams</strong> feel no downstream harm, so the game rewards them for polluting unless the downstream teams negotiate or pay.</li>
     <li>The <strong>basin totals</strong> (downstream and upstream, shown separately) are rough measures of collective welfare. Debate whether they are fair.</li>
   </ul>
+
+  <h3>8.8 Overall scores</h3>
+  <p>Points alone cannot rank teams against each other, because each role earns on a different scale: rice can pass 700 points in a game while GWI tops out at 240. The game therefore reports three overall measures, in the scoreboard and on the Compare tables page.</p>
+  <p><strong>1. Balanced score (each team, 0–100).</strong> Each team's points are compared with that role's results in 20,000 simulated games of random play after the same number of seasons (experiment B in section 15). The score is the team's percentile: 50 means typical play, 90 means better than 90% of simulated games, 100 means as good as or better than any game seen. Where many games end on exactly the same score (common for the operator), a tied score gets the middle of the tied range.</p>
+  <div class="eq"><div class="f"><i>B<sub>i</sub></i> = percentile of <i>X<sub>i</sub></i> within the simulated distribution of role <i>i</i> after <i>n</i> seasons</div><div class="tag">(18)</div></div>
+  <p><strong>2. Balanced basin score (0–100).</strong> The average of the six downstream teams' balanced scores, so every stakeholder counts equally whatever its points scale:</p>
+  <div class="eq"><div class="f"><i>B</i><sub>basin</sub> = (<i>B</i><sub>GWI</sub> + <i>B</i><sub>rice</sub> + <i>B</i><sub>sugar</sub> + <i>B</i><sub>op</sub> + <i>B</i><sub>Mahaica</sub> + <i>B</i><sub>EPA</sub>) / 6</div><div class="tag">(19)</div></div>
+  <p>The game labels 75 and above "well managed", 40–75 "typical" and below 40 "struggling". The upstream teams get balanced scores too, but they are not part of the basin score.</p>
+  <p><strong>3. Basin health index.</strong> A physical measure of how the basin fared, independent of points:</p>
+  <div class="eq"><div class="f"><i>H</i> = 100 × <i>D</i>/<i>Σd</i> − 25 × breaches − 10 × (Mahaica flood seasons + poor conservancy-water seasons + poor coastal-water seasons)</div><div class="tag">(20)</div></div>
+  <p>The downstream points total (sum of the six downstream teams) is still shown, but treat it with care: it is dominated by the rice farmers. A table can score high on points while its health index is low, for example by flooding Mahaica and polluting the coast. Those contrasts are good debrief material.</p>
+  <p>Points needed after 8 seasons for a given balanced score:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Role</th><th class="r">Score 5</th><th class="r">25</th><th class="r">50 (typical)</th><th class="r">75</th><th class="r">95</th></tr></thead>
+    <tbody><tr><td>GWI</td><td class="r num">-59</td><td class="r num">14</td><td class="r num">64</td><td class="r num">104</td><td class="r num">149</td></tr><tr><td>Rice farmers</td><td class="r num">-235</td><td class="r num">-83</td><td class="r num">8</td><td class="r num">98</td><td class="r num">231</td></tr><tr><td>Sugar estate</td><td class="r num">-103</td><td class="r num">-37</td><td class="r num">9</td><td class="r num">57</td><td class="r num">125</td></tr><tr><td>Operator</td><td class="r num">-80</td><td class="r num">40</td><td class="r num">160</td><td class="r num">160</td><td class="r num">170</td></tr><tr><td>Mahaica</td><td class="r num">-66</td><td class="r num">8</td><td class="r num">54</td><td class="r num">94</td><td class="r num">147</td></tr><tr><td>Environment</td><td class="r num">-165</td><td class="r num">-40</td><td class="r num">50</td><td class="r num">130</td><td class="r num">240</td></tr><tr><td>Upstream farmers</td><td class="r num">149</td><td class="r num">200</td><td class="r num">236</td><td class="r num">274</td><td class="r num">324</td></tr><tr><td>Upstream miners</td><td class="r num">149</td><td class="r num">224</td><td class="r num">274</td><td class="r num">329</td><td class="r num">404</td></tr></tbody>
+  </table></div>
 
   <h2 id="climate"><span class="n">09</span>Climate and forecasts</h2>
   <p>Seasons follow Guyana's coastal bimodal rainfall pattern and repeat in this order:</p>
@@ -640,7 +662,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     <li>Enter a table name at the top before starting.</li>
     <li>Do not change Settings. All tables share the same seed, so they face the same weather, forecasts and forecast errors.</li>
     <li>Do not refresh or close the tab: the game does not save, and reloading starts over.</li>
-    <li>Use Undo only to correct a typing mistake.</li>
+    <li>Check every decision before running a season: there is no undo.</li>
     <li>Each person argues for their own role, not for the table's total.</li>
     <li>Switch the upstream basin only when the facilitator announces it to the whole room.</li>
   </ul>
@@ -648,7 +670,80 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   <p>The comparison page shows a scorecard ranked by any column (share of demand met, dam breaches, Mahaica flood seasons, seasons of poor conservancy and coastal water, downstream and upstream points), the storage and quality curves of every table on shared charts, points by role, and the main choices each table made. It warns if tables used different settings, played different numbers of seasons, or set the upstream basin differently.</p>
   <p>The <strong>basin health index</strong> combines the scorecard into one number: 100 × share of demand met − 25 per dam breach − 10 per season of Mahaica flooding, poor conservancy water or poor coastal water. Treat it as a prompt for discussion rather than a verdict: the table with the most points is often not the healthiest basin, and that contrast makes a strong debrief.</p>
 
-  <h2 id="glossary"><span class="n">15</span>Glossary</h2>
+  
+  <h2 id="montecarlo"><span class="n">15</span>Monte Carlo analysis: score ranges and what works</h2>
+  <p>To find the highest and lowest scores each stakeholder can reach, and which conditions drive them, the game's own model was played automatically 20,000 times in each of two experiments, then 256 operating strategies were each tested against the same 2,000 weather sequences. All runs use the default settings; climate is drawn at random each season (El Niño 25%, Normal 50%, La Niña 25%) with the default 70% forecast accuracy. Scores are totals over 8 seasons.</p>
+  <ul>
+    <li><strong>Experiment A, weather only:</strong> every team keeps the default decisions all game (GWI 15, rice 15k ha and sugar 8k ha on medium fertilizer, full supply, release 20, reserve 90, Mahaica 60%, upstream on current practice). Only the weather changes, so A shows how much luck matters.</li>
+    <li><strong>Experiment B, random decisions:</strong> every team's decision is drawn at random each season within the game's ranges, and the upstream basin is pristine, current, expansion or played by random upstream teams. B shows the full range of outcomes, from very good play to very bad.</li>
+  </ul>
+
+  <h3>15.1 Score ranges for each stakeholder</h3>
+  <figure><svg viewBox="0 0 820 432" role="img" aria-label="Range of total scores per stakeholder over 8 seasons"><g font-size="12" fill="var(--ink)"><rect x="150" y="4" width="22" height="10" rx="3" fill="var(--water)" opacity=".55"/><text x="178" y="13">A: weather only (upper bar)</text><rect x="390" y="4" width="22" height="10" rx="3" fill="var(--muted)" opacity=".55"/><text x="418" y="13">B: random decisions (lower bar)</text></g><line x1="150.0" x2="150.0" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="150.0" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">-600</text><line x1="222.2" x2="222.2" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="222.2" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">-450</text><line x1="294.4" x2="294.4" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="294.4" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">-300</text><line x1="366.7" x2="366.7" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="366.7" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">-150</text><line x1="438.9" x2="438.9" y1="28" y2="406" stroke="var(--muted)" stroke-width="1.6"/><text x="438.9" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">0</text><line x1="511.1" x2="511.1" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="511.1" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">150</text><line x1="583.3" x2="583.3" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="583.3" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">300</text><line x1="655.6" x2="655.6" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="655.6" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">450</text><line x1="727.8" x2="727.8" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="727.8" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">600</text><line x1="800.0" x2="800.0" y1="28" y2="406" stroke="var(--line)" stroke-width="1"/><text x="800.0" y="422" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">750</text><text x="0" y="47" font-size="13" font-weight="600" fill="var(--ink)">GWI</text><line x1="415.4" x2="554.4" y1="40" y2="40" stroke="var(--water)" stroke-width="2"><title>GWI, weather only: min -49, max 240</title></line><rect x="480.7" y="34" width="73.8" height="12" rx="4" fill="var(--water)" opacity=".55"><title>GWI, weather only: 90% of games between 87 and 240</title></rect><circle cx="526.3" cy="40" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>GWI, weather only: typical (median) 182</title></circle><line x1="356.3" x2="538.9" y1="58" y2="58" stroke="var(--muted)" stroke-width="2"><title>GWI, random decisions: min -172, max 208</title></line><rect x="410.3" y="52" width="99.9" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>GWI, random decisions: 90% of games between -59 and 148</title></rect><circle cx="469.5" cy="58" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>GWI, random decisions: typical (median) 64</title></circle><text x="0" y="93" font-size="13" font-weight="600" fill="var(--ink)">Rice farmers</text><line x1="340.0" x2="785.6" y1="86" y2="86" stroke="var(--water)" stroke-width="2"><title>Rice farmers, weather only: min -205, max 720</title></line><rect x="534.9" y="80" width="250.7" height="12" rx="4" fill="var(--water)" opacity=".55"><title>Rice farmers, weather only: 90% of games between 199 and 720</title></rect><circle cx="713.3" cy="86" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>Rice farmers, weather only: typical (median) 570</title></circle><line x1="151.3" x2="731.8" y1="104" y2="104" stroke="var(--muted)" stroke-width="2"><title>Rice farmers, random decisions: min -597, max 608</title></line><rect x="325.8" y="98" width="225.6" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Rice farmers, random decisions: 90% of games between -235 and 234</title></rect><circle cx="442.5" cy="104" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Rice farmers, random decisions: typical (median) 7</title></circle><text x="0" y="139" font-size="13" font-weight="600" fill="var(--ink)">Sugar estate</text><line x1="402.8" x2="593.0" y1="132" y2="132" stroke="var(--water)" stroke-width="2"><title>Sugar estate, weather only: min -75, max 320</title></line><rect x="482.5" y="126" width="110.5" height="12" rx="4" fill="var(--water)" opacity=".55"><title>Sugar estate, weather only: 90% of games between 91 and 320</title></rect><circle cx="547.3" cy="132" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>Sugar estate, weather only: typical (median) 225</title></circle><line x1="317.1" x2="571.0" y1="150" y2="150" stroke="var(--muted)" stroke-width="2"><title>Sugar estate, random decisions: min -253, max 274</title></line><rect x="388.8" y="144" width="108.8" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Sugar estate, random decisions: 90% of games between -104 and 122</title></rect><circle cx="443.6" cy="150" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Sugar estate, random decisions: typical (median) 10</title></circle><text x="0" y="185" font-size="13" font-weight="600" fill="var(--ink)">Operator</text><line x1="318.5" x2="554.4" y1="178" y2="178" stroke="var(--water)" stroke-width="2"><title>Operator, weather only: min -250, max 240</title></line><rect x="414.8" y="172" width="139.6" height="12" rx="4" fill="var(--water)" opacity=".55"><title>Operator, weather only: 90% of games between -50 and 240</title></rect><circle cx="530.4" cy="178" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>Operator, weather only: typical (median) 190</title></circle><line x1="236.7" x2="530.4" y1="196" y2="196" stroke="var(--muted)" stroke-width="2"><title>Operator, random decisions: min -420, max 190</title></line><rect x="400.4" y="190" width="120.4" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Operator, random decisions: 90% of games between -80 and 170</title></rect><circle cx="515.9" cy="196" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Operator, random decisions: typical (median) 160</title></circle><text x="0" y="231" font-size="13" font-weight="600" fill="var(--ink)">Mahaica</text><line x1="435.0" x2="531.3" y1="224" y2="224" stroke="var(--water)" stroke-width="2"><title>Mahaica, weather only: min -8, max 192</title></line><rect x="483.2" y="218" width="48.1" height="12" rx="4" fill="var(--water)" opacity=".55"><title>Mahaica, weather only: 90% of games between 92 and 192</title></rect><circle cx="531.3" cy="224" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>Mahaica, weather only: typical (median) 192</title></circle><line x1="312.1" x2="554.9" y1="242" y2="242" stroke="var(--muted)" stroke-width="2"><title>Mahaica, random decisions: min -263, max 241</title></line><rect x="408.0" y="236" width="101.4" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Mahaica, random decisions: 90% of games between -64 and 146</title></rect><circle cx="464.7" cy="242" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Mahaica, random decisions: typical (median) 54</title></circle><text x="0" y="277" font-size="13" font-weight="600" fill="var(--ink)">Environment</text><line x1="345.0" x2="612.2" y1="270" y2="270" stroke="var(--water)" stroke-width="2"><title>Environment, weather only: min -195, max 360</title></line><rect x="414.8" y="264" width="149.3" height="12" rx="4" fill="var(--water)" opacity=".55"><title>Environment, weather only: 90% of games between -50 and 260</title></rect><circle cx="506.3" cy="270" r="5" fill="var(--water)" stroke="var(--surface)" stroke-width="2"><title>Environment, weather only: typical (median) 140</title></circle><line x1="282.4" x2="612.2" y1="288" y2="288" stroke="var(--muted)" stroke-width="2"><title>Environment, random decisions: min -325, max 360</title></line><rect x="359.4" y="282" width="195.0" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Environment, random decisions: 90% of games between -165 and 240</title></rect><circle cx="463.0" cy="288" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Environment, random decisions: typical (median) 50</title></circle><text x="0" y="323" font-size="13" font-weight="600" fill="var(--ink)">Upstream farmers</text><line x1="474.1" x2="641.0" y1="334" y2="334" stroke="var(--muted)" stroke-width="2"><title>Upstream farmers, random decisions: min 73, max 420</title></line><rect x="510.1" y="328" width="83.6" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Upstream farmers, random decisions: 90% of games between 148 and 322</title></rect><circle cx="552.4" cy="334" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Upstream farmers, random decisions: typical (median) 236</title></circle><text x="0" y="369" font-size="13" font-weight="600" fill="var(--ink)">Upstream miners</text><line x1="438.9" x2="694.6" y1="380" y2="380" stroke="var(--muted)" stroke-width="2"><title>Upstream miners, random decisions: min 0, max 531</title></line><rect x="507.7" y="374" width="128.1" height="12" rx="4" fill="var(--muted)" opacity=".55"><title>Upstream miners, random decisions: 90% of games between 143 and 409</title></rect><circle cx="570.3" cy="380" r="5" fill="var(--muted)" stroke="var(--surface)" stroke-width="2"><title>Upstream miners, random decisions: typical (median) 273</title></circle></svg>
+    <figcaption>Figure 3. Total points over 8 seasons. The dot is the typical (median) game, the bar covers 90% of games (5th to 95th percentile), and the thin line runs from the lowest to the highest game seen. Upstream teams appear only in experiment B, in games where they were played.</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Stakeholder</th><th class="r">A: weather only<br><span style="text-transform:none">min / 5% / median / 95% / max</span></th><th class="r">B: random decisions<br><span style="text-transform:none">min / 5% / median / 95% / max</span></th></tr></thead>
+    <tbody><tr><td><span class="dot" style="--c:var(--t-gwi)"></span>GWI</td><td class="r num">-49 / 87 / <strong>182</strong> / 240 / 240</td><td class="r num">-172 / -59 / <strong>64</strong> / 148 / 208</td></tr><tr><td><span class="dot" style="--c:var(--t-rice)"></span>Rice farmers</td><td class="r num">-205 / 199 / <strong>570</strong> / 720 / 720</td><td class="r num">-597 / -235 / <strong>7</strong> / 234 / 608</td></tr><tr><td><span class="dot" style="--c:var(--t-sugar)"></span>Sugar estate</td><td class="r num">-75 / 91 / <strong>225</strong> / 320 / 320</td><td class="r num">-253 / -104 / <strong>10</strong> / 122 / 274</td></tr><tr><td><span class="dot" style="--c:var(--t-op)"></span>Operator</td><td class="r num">-250 / -50 / <strong>190</strong> / 240 / 240</td><td class="r num">-420 / -80 / <strong>160</strong> / 170 / 190</td></tr><tr><td><span class="dot" style="--c:var(--t-mahaica)"></span>Mahaica</td><td class="r num">-8 / 92 / <strong>192</strong> / 192 / 192</td><td class="r num">-263 / -64 / <strong>54</strong> / 146 / 241</td></tr><tr><td><span class="dot" style="--c:var(--t-env)"></span>Environment</td><td class="r num">-195 / -50 / <strong>140</strong> / 260 / 360</td><td class="r num">-325 / -165 / <strong>50</strong> / 240 / 360</td></tr><tr><td><span class="dot" style="--c:var(--t-upfarm)"></span>Upstream farmers</td><td class="r num">—</td><td class="r num">73 / 148 / <strong>236</strong> / 322 / 420</td></tr><tr><td><span class="dot" style="--c:var(--t-upmine)"></span>Upstream miners</td><td class="r num">—</td><td class="r num">0 / 143 / <strong>273</strong> / 409 / 531</td></tr><tr><td><strong>Downstream total</strong></td><td class="r num">-130 / 649 / <strong>1,385</strong> / 1,932 / 2,072</td><td class="r num">-881 / -265 / <strong>274</strong> / 790 / 1,362</td></tr></tbody>
+  </table></div>
+  <p><strong>Using these as score bands in the debrief.</strong> A table whose stakeholder lands above the 95% value of experiment B played that role very well; below the 5% value, very badly. For example, a rice team scoring over 234 did better than 95% of random play, and the operator can score anywhere from -420 to 190. The upstream teams score 148–322 (farmers) and 143–409 (miners) whatever happens downstream, because they never pay for downstream harm.</p>
+
+  <h3>15.2 How much the weather alone matters</h3>
+  <p>With no change in decisions, the downstream total ranges from 649 to 1,932 in 90% of games. The number of El Niño seasons drives shortages; the number of La Niña seasons drives dam breaches. With the default release of 20 Mm³, the dam overtops at least once in <strong>38%</strong> of games.</p>
+  <div class="two-tables">
+  <div class="scroll"><table>
+    <thead><tr><th>El Niño seasons</th><th class="r">Games</th><th class="r">Demand met</th><th class="r">GWI pts</th><th class="r">Rice pts</th><th class="r">Downstream total</th></tr></thead>
+    <tbody><tr><td class="num">0</td><td class="r num">1,984</td><td class="r num">99%</td><td class="r num">191</td><td class="r num">662</td><td class="r num">1,596</td></tr><tr><td class="num">1</td><td class="r num">5,373</td><td class="r num">93%</td><td class="r num">190</td><td class="r num">615</td><td class="r num">1,530</td></tr><tr><td class="num">2</td><td class="r num">6,264</td><td class="r num">86%</td><td class="r num">179</td><td class="r num">539</td><td class="r num">1,387</td></tr><tr><td class="num">3</td><td class="r num">4,058</td><td class="r num">77%</td><td class="r num">158</td><td class="r num">441</td><td class="r num">1,197</td></tr><tr><td class="num">4</td><td class="r num">1,765</td><td class="r num">68%</td><td class="r num">129</td><td class="r num">333</td><td class="r num">973</td></tr></tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>La Niña seasons</th><th class="r">Games</th><th class="r">Games with a breach</th><th class="r">Downstream total</th></tr></thead>
+    <tbody><tr><td class="num">0</td><td class="r num">1,938</td><td class="r num">0%</td><td class="r num">1,163</td></tr><tr><td class="num">1</td><td class="r num">5,248</td><td class="r num">19%</td><td class="r num">1,326</td></tr><tr><td class="num">2</td><td class="r num">6,339</td><td class="r num">38%</td><td class="r num">1,419</td></tr><tr><td class="num">3</td><td class="r num">4,211</td><td class="r num">59%</td><td class="r num">1,405</td></tr><tr><td class="num">4</td><td class="r num">1,715</td><td class="r num">77%</td><td class="r num">1,321</td></tr></tbody>
+  </table></div>
+  </div>
+
+  <h3>15.3 What drives each stakeholder's score</h3>
+  <p>From experiment B: the conditions most strongly linked with each team's total, as rank correlations (Spearman ρ; ±1 is a perfect link, values under 0.1 are omitted).</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Stakeholder</th><th>Raises the score</th><th>Lowers the score</th></tr></thead>
+    <tbody><tr><td><span class="dot" style="--c:var(--t-gwi)"></span>GWI</td><td>—</td><td>upstream expansion <span class="num">(-0.63)</span>, more upstream mining <span class="num">(-0.62)</span>, more upstream farmland <span class="num">(-0.62)</span>, more El Niño seasons <span class="num">(-0.32)</span></td></tr><tr><td><span class="dot" style="--c:var(--t-rice)"></span>Rice farmers</td><td>more supply to rice <span class="num">(+0.31)</span>, more La Niña seasons <span class="num">(+0.29)</span>, larger sluice releases <span class="num">(+0.22)</span></td><td>more El Niño seasons <span class="num">(-0.41)</span></td></tr><tr><td><span class="dot" style="--c:var(--t-sugar)"></span>Sugar estate</td><td>more supply to sugar <span class="num">(+0.34)</span>, larger sluice releases <span class="num">(+0.22)</span>, more La Niña seasons <span class="num">(+0.19)</span></td><td>more El Niño seasons <span class="num">(-0.35)</span></td></tr><tr><td><span class="dot" style="--c:var(--t-op)"></span>Operator</td><td>more El Niño seasons <span class="num">(+0.16)</span></td><td>more La Niña seasons <span class="num">(-0.40)</span>, larger sluice releases <span class="num">(-0.19)</span>, more upstream mining <span class="num">(-0.12)</span></td></tr><tr><td><span class="dot" style="--c:var(--t-mahaica)"></span>Mahaica</td><td>—</td><td>larger sluice releases <span class="num">(-0.62)</span>, more La Niña seasons <span class="num">(-0.38)</span>, more upstream farmland <span class="num">(-0.31)</span>, more upstream mining <span class="num">(-0.31)</span></td></tr><tr><td><span class="dot" style="--c:var(--t-env)"></span>Environment</td><td>—</td><td>more upstream farmland <span class="num">(-0.44)</span>, more upstream mining <span class="num">(-0.43)</span>, upstream expansion <span class="num">(-0.43)</span>, more El Niño seasons <span class="num">(-0.37)</span></td></tr><tr><td><strong>Downstream total</strong></td><td>—</td><td>more upstream farmland <span class="num">(-0.35)</span>, more upstream mining <span class="num">(-0.35)</span>, upstream expansion <span class="num">(-0.35)</span>, more El Niño seasons <span class="num">(-0.35)</span></td></tr></tbody>
+  </table></div>
+  <p>The best 10% of games for the downstream basin, compared with the worst 10%, had fewer El Niño seasons (2.8 → 1.3), far less upstream expansion (in 56% → 5% of seasons) and less upstream mining, almost no dam breaches (0.72 → 0.07 per game) and almost no seasons of poor conservancy water (3.8 → 0.2). <em>The single strongest influence on GWI, the Environment team and the basin total is what happens upstream, which no downstream team controls.</em></p>
+
+  <h3>15.4 Which strategies work best</h3>
+  <p>256 combinations were tested, each against the same 2,000 weather sequences, with the drinking-water-first council rule and upstream on current practice:</p>
+  <ul>
+    <li><strong>Operator release:</strong> a fixed release every season (0, 20, 40 or 60 Mm³), or a forecast-based rule that releases whatever is needed to bring the conservancy to an end-of-season target (160, 200, 240 or 280 Mm³), using the rainfall outlook to estimate inflow.</li>
+    <li><strong>Supply:</strong> always 100%, or cut irrigation to 70% when El Niño is forecast in a dry season.</li>
+    <li><strong>EPA reserve:</strong> 90 or 120 Mm³. <strong>Rice planting:</strong> always 15k ha, or 10k ha when El Niño is forecast at sowing. <strong>Fertilizer:</strong> medium or high, with or without buffer strips.</li>
+  </ul>
+  <div class="scroll"><table>
+    <thead><tr><th>Rank</th><th>Release rule</th><th>Supply</th><th class="r">Reserve</th><th>Rice planting</th><th>Fertilizer</th><th class="r">Mean total</th><th class="r">Bad-luck total (5%)</th><th class="r">Games with breach</th><th class="r">Mahaica floods / game</th><th class="r">Poor-coast seasons / game</th></tr></thead>
+    <tbody><tr><td class="num">1</td><td>end storage target 280</td><td>full supply</td><td class="r num">90</td><td>15k ha</td><td>high</td><td class="r num"><strong>1,601</strong></td><td class="r num">902</td><td class="r num">27%</td><td class="r num">0.7</td><td class="r num">0.8</td></tr><tr><td class="num">2</td><td>end storage target 280</td><td>full supply</td><td class="r num">120</td><td>15k ha</td><td>high</td><td class="r num"><strong>1,594</strong></td><td class="r num">950</td><td class="r num">27%</td><td class="r num">0.8</td><td class="r num">0.9</td></tr><tr><td class="num">3</td><td>end storage target 280</td><td>full supply</td><td class="r num">90</td><td>15k ha</td><td>high + buffer</td><td class="r num"><strong>1,593</strong></td><td class="r num">894</td><td class="r num">27%</td><td class="r num">0.7</td><td class="r num">0.0</td></tr><tr><td class="num">4</td><td>end storage target 280</td><td>full supply</td><td class="r num">120</td><td>15k ha</td><td>high + buffer</td><td class="r num"><strong>1,587</strong></td><td class="r num">951</td><td class="r num">27%</td><td class="r num">0.8</td><td class="r num">0.0</td></tr><tr><td class="num">5</td><td>end storage target 280</td><td>full supply</td><td class="r num">90</td><td>cut to 10k ha if El Niño forecast</td><td>high</td><td class="r num"><strong>1,586</strong></td><td class="r num">931</td><td class="r num">28%</td><td class="r num">0.8</td><td class="r num">0.8</td></tr><tr><td colspan="11" class="hint">…</td></tr><tr><td class="num">134</td><td>fixed release 20</td><td>full supply</td><td class="r num">90</td><td>15k ha</td><td>med</td><td class="r num"><strong>1,366</strong></td><td class="r num">632</td><td class="r num">37%</td><td class="r num">0.0</td><td class="r num">0.0</td></tr><tr><td colspan="11" class="hint">…</td></tr><tr><td class="num">256</td><td>fixed release 60</td><td>cut irrigation to 70% when El Niño is forecast in a dry season</td><td class="r num">120</td><td>15k ha</td><td>high</td><td class="r num"><strong>740</strong></td><td class="r num">-60</td><td class="r num">14%</td><td class="r num">0.0</td><td class="r num">3.1</td></tr></tbody>
+  </table></div>
+  <p>Best version of each release rule:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Release rule</th><th class="r">Best rank</th><th class="r">Mean downstream total</th><th class="r">Games with breach</th><th class="r">Mahaica floods / game</th><th class="r">Demand met</th></tr></thead>
+    <tbody><tr><td>End storage target 280</td><td class="r num">1</td><td class="r num">1,601</td><td class="r num">27%</td><td class="r num">0.7</td><td class="r num">91%</td></tr><tr><td>End storage target 240</td><td class="r num">7</td><td class="r num">1,579</td><td class="r num">20%</td><td class="r num">0.8</td><td class="r num">89%</td></tr><tr><td>End storage target 200</td><td class="r num">46</td><td class="r num">1,512</td><td class="r num">15%</td><td class="r num">1.1</td><td class="r num">87%</td></tr><tr><td>End storage target 160</td><td class="r num">127</td><td class="r num">1,381</td><td class="r num">12%</td><td class="r num">1.8</td><td class="r num">85%</td></tr><tr><td>Fixed release 0</td><td class="r num">33</td><td class="r num">1,522</td><td class="r num">53%</td><td class="r num">0.0</td><td class="r num">93%</td></tr><tr><td>Fixed release 20</td><td class="r num">117</td><td class="r num">1,401</td><td class="r num">39%</td><td class="r num">0.0</td><td class="r num">88%</td></tr><tr><td>Fixed release 40</td><td class="r num">190</td><td class="r num">1,228</td><td class="r num">25%</td><td class="r num">0.0</td><td class="r num">80%</td></tr><tr><td>Fixed release 60</td><td class="r num">209</td><td class="r num">1,106</td><td class="r num">15%</td><td class="r num">0.0</td><td class="r num">74%</td></tr></tbody>
+  </table></div>
+  <p><strong>What the results say.</strong></p>
+  <ul>
+    <li><strong>Use the forecast.</strong> Forecast-based release rules hold the top places. The default fixed release of 20 ranks 134 of 256 (mean 1,366, breach in 37% of games); the best strategy averages 1,601 with breaches in 27%.</li>
+    <li><strong>Releasing a fixed amount every season is the worst approach.</strong> Releasing 60 every season drains the conservancy, so users get only about 59% of their demand.</li>
+    <li><strong>There is a real trade-off between the dam and Mahaica.</strong> A low target (160) cuts breaches to about 12% of games but floods Mahaica 1.8 times per game; a high target (280) floods Mahaica less but breaches more. No rule removes both risks.</li>
+    <li><strong>Some breaches cannot be prevented.</strong> Even the best strategies see a breach in a fifth to a quarter of games, because a La Niña long wet season brings far more water than the sluices can release in one season. That points to infrastructure capacity (larger relief sluices, a higher dam) rather than operating rules.</li>
+    <li><strong>Buffer strips are nearly free.</strong> Adding buffer strips to the best strategy removes poor-coast seasons entirely (0.83 → 0.00 per game) for a loss of only 8 points.</li>
+    <li><strong>Cutting irrigation ahead of a forecast drought did not pay</strong> in these runs: none of the top strategies use it, because the forecast is wrong 30% of the time and a cut crop loses yield for certain.</li>
+  </ul>
+
+  <h3>15.5 What this says about the game's calibration</h3>
+  <ul>
+    <li><strong>Pollution is cheap in the scores.</strong> High fertilizer without buffer strips tops the downstream total, because the farms' extra profit outweighs the Environment team's penalty. If you want the game to push harder towards clean water, raise the estuary penalty or the farms' share of it in Settings.</li>
+    <li><strong>The upstream teams cannot lose.</strong> This is intended, since it shows the externality, but it means negotiation and payment are the only way to change their behaviour.</li>
+    <li><strong>Breach risk is high with default play</strong> (about 38% of games). That makes the La Niña season memorable, but if it feels too punishing, raise the sluice capacity or the dam crest in Settings.</li>
+  </ul>
+  <p class="hint">Method: the simulation scripts call the same model code as the game (mc/mc.js and mc/policy.js). Experiment B samples each decision uniformly within the game's ranges every season, respecting the rice crop calendar. Strategies use fixed GWI, sugar and Mahaica decisions. Results are reproducible from the stated seeds.</p>
+
+  <h2 id="glossary"><span class="n">16</span>Glossary</h2>
   <div class="scroll"><table>
     <tbody>
       <tr><td><strong>Conservancy</strong></td><td>A large shallow reservoir behind an earthen dam on Guyana's coast, storing water for supply and irrigation and protecting the coast from inland flooding.</td></tr>
@@ -669,7 +764,7 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
     </tbody>
   </table></div>
 
-  <h2 id="references"><span class="n">16</span>References</h2>
+  <h2 id="references"><span class="n">17</span>References</h2>
   <ol class="refs">
     <li>Global Water Partnership (2000). <em>Integrated Water Resources Management.</em> TAC Background Paper No. 4. Stockholm: GWP.</li>
     <li>International Conference on Water and the Environment (1992). <em>The Dublin Statement on Water and Sustainable Development.</em> Dublin.</li>
@@ -688,9 +783,51 @@ footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-si
   </ol>
 
   <footer>
-    Conservancy Council · Game documentation v2.2 · Faculty of Earth and Environmental Sciences, University of Guyana. Teaching material with illustrative data. <a href="index.html">Back to the game</a>.
+    Conservancy Council · Game documentation v2.5 · Faculty of Earth and Environmental Sciences, University of Guyana. Teaching material with illustrative data. <a href="index.html">Back to the game</a>.
   </footer>
 </main>
 </div>
+<script>
+/* ---------- pictorial icons (original line drawings, 24×24 grid) ---------- */
+const ICON_PATHS = {
+  // GWI: tap with a falling drop
+  tap: `<path d="M2 9h8.5a3 3 0 0 1 3 3v1.5"/><path d="M2 12.5h6.5"/><path d="M8 5v4"/><path d="M5 5h6"/><path d="M13.5 16.2c1.1 1.4 1.7 2.4 1.7 3.2a1.7 1.7 0 0 1-3.4 0c0-.8.6-1.8 1.7-3.2z" fill="currentColor" stroke="none"/><path d="M17 20.5c1.2-.8 2.6-.8 4 0"/>`,
+  // Rice: stalk with drooping panicle of grains
+  rice: `<path d="M7.5 22c0-6 1.6-11.2 5.3-15"/><path d="M12.8 7c3.2-1.6 6.4-.4 8 3.6"/><path d="M14.8 7.2c1.8 1 2.9 2.8 3.1 5"/><path d="M7.5 22c-2.6-3-3-6.6-1.4-10"/><path d="M7.5 22c1.6-2.5 3.8-3.9 6.6-4.3"/>` +
+        [[14.4,5.9,-10],[16.4,5.6,10],[18.3,6.2,30],[19.8,7.6,50],[20.7,9.5,70],[21,11.6,88],[16.6,9,45],[17.6,11,65],[18,13,85]].map(([x,y,a]) => `<ellipse cx="${x}" cy="${y}" rx=".85" ry="1.5" transform="rotate(${a} ${x} ${y})" fill="currentColor" stroke="none"/>`).join(''),
+  // Sugar cane: two jointed stalks with leaves
+  cane: `<path d="M9 22V5"/><path d="M15.5 22V8"/><path d="M7.4 10h3.2M7.4 15h3.2M7.4 19.5h3.2M13.9 12.5h3.2M13.9 17.5h3.2"/><path d="M9 5C6.6 3.6 4.2 3.8 2.5 5.8"/><path d="M9 5c1.8-2.4 4.6-3 7.2-2"/><path d="M15.5 8c1.6-2.2 4-2.7 6-1.7"/><path d="M15.5 8c-1.1-1.7-2.7-2.3-4.1-2.1"/>`,
+  // Operator: sluice gate between two posts, water flowing out below
+  sluice: `<path d="M5 3v15M19 3v15"/><rect x="8" y="4.5" width="8" height="10" rx="1"/><path d="M8 8h8M8 11.2h8"/><path d="M12 2v2.5"/><path d="M3 18h18"/><path d="M6 21.2c1-.8 2-.8 3 0s2 .8 3 0 2-.8 3 0 2 .8 3 0"/>`,
+  // Mahaica: cow head (livestock)
+  cow: `<path d="M8 9.5h8l.6 5.6a4.6 4.6 0 0 1-9.2 0z"/><path d="M8 10.5 4 8.8M16 10.5l4-1.7"/><path d="M8.6 9.5C8.3 7.4 7 6.2 5.4 6M15.4 9.5c.3-2.1 1.6-3.3 3.2-3.5"/><ellipse cx="12" cy="16.6" rx="3" ry="2" /><circle cx="10.6" cy="16.6" r=".55" fill="currentColor" stroke="none"/><circle cx="13.4" cy="16.6" r=".55" fill="currentColor" stroke="none"/><circle cx="10" cy="12.2" r=".75" fill="currentColor" stroke="none"/><circle cx="14" cy="12.2" r=".75" fill="currentColor" stroke="none"/>`,
+  // Environment: leaf
+  leaf: `<path d="M5 19.5C5 10.5 11 5 20 4.5c0 9-5.5 15-14.5 15"/><path d="M5 19.5c3.4-4.6 6.8-7.6 10.6-9.6"/><path d="M3 21.5l2-2"/>`,
+  // Upstream farms: field rows with a sprout
+  field: `<path d="M2 15h20"/><path d="M4 21l4-6M10 21l1.4-6M14 21l-1.4-6M20 21l-4-6"/><path d="M12 15V8.5"/><path d="M12 11c-2.4 0-4-1.2-4.6-3.4 2.4 0 4 1.2 4.6 3.4z"/><path d="M12 9.6c2.4 0 4-1.2 4.6-3.4-2.4 0-4 1.2-4.6 3.4z"/>`,
+  // Upstream miners: pickaxe and gold nugget
+  pick: `<path d="M4 21 14 8.5"/><path d="M6.2 5.4c3.6-2 8.6-1.8 12.6 1.4"/><path d="M11 6.4 15.8 10"/><path d="M15.4 17.8l1.9-2.3 2.9.4.6 2.8-2.3 1.6-2.8-.6z" fill="currentColor" stroke="none"/>`,
+  // Upstream catchment: hills, forest and a stream
+  hills: `<path d="M2 19 8 9.5l4 5.5 3-4 7 8z"/><path d="M5 19.5c1.6-1.4 3.6-1.4 5.2 0"/><path d="M18.5 11V6.8"/><circle cx="18.5" cy="5" r="2.4" fill="currentColor" stroke="none"/>`,
+  // Estuary: fish
+  fish: `<path d="M2.5 12c3-4 8-5.3 12.2-3.3 1.8.9 3 2 4 3.3-1 1.3-2.2 2.4-4 3.3C10.5 17.3 5.5 16 2.5 12z"/><path d="M18.7 12 22 8.8v6.4z"/><circle cx="6.8" cy="11.2" r=".85" fill="currentColor" stroke="none"/><path d="M10.5 9.5c.8 1.6.8 3.4 0 5"/>`,
+  // Conservancy: water waves
+  waves: `<path d="M2 8c2.2-1.6 4.4-1.6 6.6 0s4.4 1.6 6.6 0 4.4-1.6 6.6 0"/><path d="M2 13c2.2-1.6 4.4-1.6 6.6 0s4.4 1.6 6.6 0 4.4-1.6 6.6 0"/><path d="M2 18c2.2-1.6 4.4-1.6 6.6 0s4.4 1.6 6.6 0 4.4-1.6 6.6 0"/>`,
+  // Evaporation: sun
+  sun: `<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>`,
+  // Inflow: rain cloud
+  rain: `<path d="M7 15.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 8.6a3.5 3.5 0 0 0 0 6.9z"/><path d="M8.5 18.5l-1 2.5M12.5 18.5l-1 2.5M16.5 18.5l-1 2.5"/>`
+};
+const TEAM_ICON = { gwi:'tap', rice:'rice', sugar:'cane', op:'sluice', mahaica:'cow', env:'leaf', upfarm:'field', upmine:'pick' };
+function icon(name, size = 28, cls = 'ico'){
+  return `<svg class="${cls}" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</svg>`;
+}
+function iconAt(name, x, y, size, color){
+  return `<g transform="translate(${x} ${y}) scale(${size/24})" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</g>`;
+}
+
+(function(){ const order=['gwi','rice','sugar','op','mahaica','env','upfarm','upmine'];
+  document.querySelectorAll('.roles .role').forEach((el,i)=>{ const h=el.querySelector('h4'); if(h && order[i]) h.insertAdjacentHTML('afterbegin', `<span class="tico">${icon(TEAM_ICON[order[i]], 26)}</span>`); }); })();
+</script>
 </body>
 </html>
